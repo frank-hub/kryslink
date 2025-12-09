@@ -1,0 +1,68 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+use Laravel\Fortify\Features;
+use App\Http\Controllers\UserController;
+
+Route::get('/', function () {
+    return Inertia::render('welcome', [
+        'canRegister' => Features::enabled(Features::registration()),
+    ]);
+})->name('home');
+
+Route::post('login',[UserController::class,'login'])->name('login');
+
+Route::post('register',[UserController::class,'register'])->name('register');
+
+Route::get('/marketplace', function () {
+    return Inertia::render('Marketplace');
+})->name('marketplace');
+
+Route::get('/checkout', function () {
+    return Inertia::render('Checkout');
+})->name('checkout');
+
+Route::get('/cart', function () {
+    return Inertia::render('Cart');
+})->name('cart');
+
+Route::get('/product_show', function () {
+    return Inertia::render('ProductShow');
+})->name('product_show');
+
+Route::get('/payment', function () {
+    return Inertia::render('PaymentConfirmation');
+})->name('payment');
+
+Route::group(['prefix' => 'dashboard'], function () {
+            Route::get('/index', function () {
+            return Inertia::render('Dashboard/index');
+        })->name('dashboard.index');
+
+        Route::get('/orders', function () {
+            return Inertia::render('Dashboard/orders');
+        })->name('dashboard.orders');
+    });
+Route::group(['middleware' => ['auth', 'verified']], function () {
+
+    // Route::group(['prefix' => 'dashboard'], function () {
+    //         Route::get('/index', function () {
+    //         return Inertia::render('Dashboard/index');
+    //     })->name('dashboard.index');
+
+    //     Route::get('/orders', function () {
+    //         return Inertia::render('Dashboard/orders');
+    //     })->name('dashboard.orders');
+    // });
+    Route::get('/profile', [App\Http\Controllers\UserController::class, 'index'])->name('profile');
+    Route::post('/profile', [App\Http\Controllers\UserController::class, 'update'])->name('profile.update');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+});
+
+require __DIR__.'/settings.php';
