@@ -60,7 +60,7 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
             </button>
 
             {isLoggedIn ? (
-               <Link href="/profile" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+               <Link href="/dashboard/index" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
                  <User className="h-5 w-5" />
                </Link>
             ) : (
@@ -268,7 +268,7 @@ const handleNewUser = async() => {
     try {
         const response = await axios.post('/register',newUser);
 
-        alert(`Your Account Under ${response.data.business_name} was created`)
+        alert(`Your Account Under ${newUser.business_name} was created`)
     }catch(error:any){
         console.error('Registration Error:', error.response);
         alert(`Registration Failed: ${error.response?.data?.message || error.message}`);
@@ -276,6 +276,21 @@ const handleNewUser = async() => {
 
 }
 
+const handleLogin = async() => {
+    if (!newUser.email || !newUser.password) {
+        alert('Please enter both email and password to sign in.');
+        return;
+    }
+    try {
+        const response = await axios.post('/authlogin',{email: newUser.email, password: newUser.password});
+
+        alert('Login successful!');
+        onClose();
+    } catch (error: any) {
+        console.error('Login Error:', error.response);
+        alert(`Login Failed: ${error.response?.data?.message || error.message}`);
+    }
+}
 
     const [isLogin, setIsLogin] = useState(true);
     const [userType, setUserType] = useState('PHARMACY');
@@ -346,12 +361,8 @@ const handleNewUser = async() => {
                           value={newUser.password}
                           onChange={(e) => setNewUser({...newUser,password: e.target.value})}
                            className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Password" required />
-                           <input type='password'
-                           value={newUser.password_confirmation}
-                           onChange={(e) => setNewUser({...newUser,password_confirmation: e.target.value})}
-                           className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder='Confirm Password' required />
                           <button type="submit"
-                          onClick={handleNewUser}
+                          onClick={() => {  handleLogin(); }}
                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e]">{isLogin ? 'Sign In' : 'Submit for Verification'}</button>
                       </form>
                       <div className="mt-6 text-center"><button onClick={() => setIsLogin(!isLogin)} className="font-medium text-[#0d9488] hover:text-[#0f766e] text-sm">{isLogin ? 'Register Now' : 'Sign In'}</button></div>

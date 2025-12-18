@@ -11,9 +11,9 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::post('login',[UserController::class,'login'])->name('login');
+Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 
-Route::post('register',[UserController::class,'register'])->name('register');
+Route::post('register',[UserController::class,'register'])->name('user.register');
 
 Route::get('/marketplace', function () {
     return Inertia::render('Marketplace');
@@ -46,17 +46,46 @@ Route::group(['prefix' => 'dashboard'], function () {
     });
 Route::group(['middleware' => ['auth', 'verified']], function () {
 
-    // Route::group(['prefix' => 'dashboard'], function () {
-    //         Route::get('/index', function () {
-    //         return Inertia::render('Dashboard/index');
-    //     })->name('dashboard.index');
+    Route::group(['prefix' => 'supplier'], function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('Supplier/Dashboard');
+        })->name('supplier.dashboard');
 
-    //     Route::get('/orders', function () {
-    //         return Inertia::render('Dashboard/orders');
-    //     })->name('dashboard.orders');
-    // });
-    Route::get('/profile', [App\Http\Controllers\UserController::class, 'index'])->name('profile');
-    Route::post('/profile', [App\Http\Controllers\UserController::class, 'update'])->name('profile.update');
+        Route::get('/products', function () {
+            return Inertia::render('Supplier/Products');
+        })->name('supplier.products');
+
+        Route::get('/products/create', function () {
+            return Inertia::render('Supplier/CreateProduct');
+        })->name('supplier.create');
+
+        Route::get('/orders', function () {
+            return Inertia::render('Supplier/Orders');
+        })->name('supplier.orders');
+
+        Route::get('/shipments', function () {
+            return Inertia::render('Supplier/Shipments');
+        })->name('supplier.shipments');
+
+        Route::get('/finance', function () {
+            return Inertia::render('Supplier/Finance');
+        })->name('supplier.finance');
+
+        Route::get('/invoices', function () {
+            return Inertia::render('Supplier/Invoices');
+        })->name('supplier.invoices');
+
+        Route::get('/settings', function () {
+            return Inertia::render('Supplier/Settings');
+        })->name('supplier.settings');
+
+        Route::get('/analytics', function () {
+            return Inertia::render('Supplier/Analytics');
+        })->name('supplier.analytics');
+    });
+
+
+
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

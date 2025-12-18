@@ -48,7 +48,7 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
             </button>
 
             {isLoggedIn ? (
-               <Link href="/profile" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+               <Link href="/dashboard/index" className="p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
                  <User className="h-5 w-5" />
                </Link>
             ) : (

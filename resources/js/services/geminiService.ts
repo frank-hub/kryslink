@@ -1,20 +1,10 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = 'AIzaSyC4JyidwjZ9UvB5fPve4oO-pX_MO-7KQ2A';
-
-let ai: GoogleGenAI | null = null;
-
-if (apiKey) {
-  ai = new GoogleGenAI({ apiKey });
-}
+// Initialize the Gemini API client. Direct access to process.env.API_KEY is required.
+const ai = new GoogleGenAI({ apiKey:'AIzaSyC4JyidwjZ9UvB5fPve4oO-pX_MO-7KQ2A' });
 
 export const generateAIResponse = async (userMessage: string, context?: string): Promise<string> => {
-  if (!ai) {
-    return "I'm sorry, my AI brain isn't connected right now (API Key missing). Please check back later.";
-  }
-
   try {
-    const model = ai.models;
     const systemInstruction = `
       You are "Daktari AI", a helpful and knowledgeable pharmaceutical assistant for MediConnect Kenya.
 
@@ -31,8 +21,9 @@ export const generateAIResponse = async (userMessage: string, context?: string):
       Keep responses concise (under 100 words unless detailed explanation needed).
     `;
 
-    const response = await model.generateContent({
-      model: 'gemini-2.5-flash',
+    // Always use ai.models.generateContent and select the appropriate model for general text tasks.
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
       contents: userMessage,
       config: {
         systemInstruction: systemInstruction,
