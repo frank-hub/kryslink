@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Supplier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -58,7 +58,7 @@ class ProductController extends Controller
     {
         $categories = Category::active()->get();
 
-        return Inertia::render('Supplier/Products/Create', [
+        return Inertia::render('Supplier/CreateProduct', [
             'categories' => $categories,
         ]);
     }
@@ -77,12 +77,6 @@ class ProductController extends Controller
             'pack_size' => 'nullable|string|max:100',
             'dosage' => 'nullable|string|max:100',
             'form' => 'nullable|string|max:100',
-            'manufacturer' => 'nullable|string|max:255',
-            'country_of_origin' => 'nullable|string|max:100',
-            'batch_number' => 'nullable|string|max:100',
-            'expiry_date' => 'nullable|date|after:today',
-            'requires_prescription' => 'boolean',
-            'requires_cold_chain' => 'boolean',
             'status' => 'required|in:draft,active',
             'images' => 'nullable|array|max:5',
             'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',

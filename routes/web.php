@@ -63,9 +63,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::post('/products/store', [ProductController::class, 'store'])->name('supplier.products.store');
 
-        Route::get('/products/create', function () {
-            return Inertia::render('Supplier/CreateProduct');
-        })->name('supplier.create');
+        Route::get('/products/create', [ProductController::class, 'create'])->name('supplier.products.create');
 
         Route::get('/orders', function () {
             return Inertia::render('Supplier/Orders');

@@ -42,7 +42,7 @@ class UserController extends Controller
     public function register(Request $request)
     {
         // TODO: Work on validation and error handling
-        $request->validate([
+        $validated = $request->validate([
             // 'name' => 'required|string|max:255', // Maps to "Contact Person" or "Business Owner"
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
@@ -55,7 +55,12 @@ class UserController extends Controller
         ]);
 
         $role = $request->user_type === 'SUPPLIER' ? 'SUPPLIER' : 'CUSTOMER';
-        
+
+
+        if(!$validated){
+            return redirect()->back();
+        }
+
         $user = User::create([
             'name' => $request->business_name,
             'email' => $request->email,
@@ -75,7 +80,7 @@ class UserController extends Controller
             return redirect('/supplier/dashboard');
         }
 
-        return redirect('/dashboard');
+        return Inertia::render('Dashboard/index');
     }
 
     public function login(Request $request)
@@ -88,7 +93,7 @@ class UserController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->intended('/dashboard');
+            return Inertia::render('Dashboard/index');
         }
 
         return back()->withErrors([

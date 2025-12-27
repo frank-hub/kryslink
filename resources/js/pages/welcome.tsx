@@ -281,15 +281,38 @@ const handleLogin = async() => {
         alert('Please enter both email and password to sign in.');
         return;
     }
-    try {
-        const response = await axios.post('/authlogin',{email: newUser.email, password: newUser.password});
 
+    try {
+        const response = await axios.post('/authlogin', {
+            email: newUser.email,
+            password: newUser.password
+        });
+
+        if (response && response.data.success) {
         alert('Login successful!');
+        }else{
+            alert(response.data.message || 'Login failed. Please try again.');
+        }
+
         onClose();
-    } catch (error: any) {
-        console.error('Login Error:', error.response);
-        alert(`Login Failed: ${error.response?.data?.message || error.message}`);
+
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            // Axios-specific error handling
+            console.error('Login Error:', error.response?.data);
+
+            const errorMessage = error.response?.data?.message
+                || error.response?.data?.error
+                || 'Login failed. Please try again.';
+
+            alert(`Login Failed: ${errorMessage}`);
+        } else {
+            // Generic error handling
+            console.error('Unexpected error:', error);
+            alert('An unexpected error occurred. Please try again.');
+        }
     }
+
 }
 
     const [isLogin, setIsLogin] = useState(true);
@@ -361,8 +384,12 @@ const handleLogin = async() => {
                           value={newUser.password}
                           onChange={(e) => setNewUser({...newUser,password: e.target.value})}
                            className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Password" required />
+                           <input type="password_confirmation"
+                          value={newUser.password_confirmation}
+                          onChange={(e) => setNewUser({...newUser,password_confirmation: e.target.value})}
+                           className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Confirm Password" required />
                           <button type="submit"
-                          onClick={() => {  handleLogin(); }}
+                          onClick={() => {  handleNewUser(); }}
                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e]">{isLogin ? 'Sign In' : 'Submit for Verification'}</button>
                       </form>
                       <div className="mt-6 text-center"><button onClick={() => setIsLogin(!isLogin)} className="font-medium text-[#0d9488] hover:text-[#0f766e] text-sm">{isLogin ? 'Register Now' : 'Sign In'}</button></div>
