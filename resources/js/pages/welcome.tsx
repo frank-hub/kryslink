@@ -35,7 +35,7 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
             <div className="bg-[#0d9488] p-2 rounded-lg mr-2">
               <ShieldCheck className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-800 tracking-tight">MediConnect<span className="text-[#0d9488]">KE</span></span>
+            <span className="text-xl font-bold text-slate-800 tracking-tight">Krys<span className="text-[#0d9488]">Link</span></span>
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
@@ -113,7 +113,7 @@ const Footer = () => (
                <div className="bg-[#0d9488] p-2 rounded-lg mr-2">
                   <ShieldCheck className="h-6 w-6 text-white" />
                </div>
-               <span className="text-xl font-bold text-slate-900 tracking-tight">MediConnect<span className="text-[#0d9488]">KE</span></span>
+               <span className="text-xl font-bold text-slate-900 tracking-tight">Krys<span className="text-[#0d9488]">Link</span></span>
             </div>
             <p className="text-sm text-slate-500">
               Connecting Kenya's healthcare providers with trusted pharmaceutical suppliers. Seamless, compliant, and efficient.

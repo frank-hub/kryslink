@@ -1,10 +1,22 @@
+
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize the Gemini API client. Direct access to process.env.API_KEY is required.
-const ai = new GoogleGenAI({ apiKey:'AIzaSyC4JyidwjZ9UvB5fPve4oO-pX_MO-7KQ2A' });
-
+/**
+ * Generates an AI response using the Gemini API.
+ * Instantiates the client inside the function to ensure the latest API key is used,
+ * which is critical for environments where the key might be injected or updated dynamically.
+ */
 export const generateAIResponse = async (userMessage: string, context?: string): Promise<string> => {
   try {
+    // Check if API key is available
+    if (!process.env.API_KEY) {
+      console.error("Gemini API Error: API_KEY is missing from the environment.");
+      return "System configuration error: API key is missing. Please contact support.";
+    }
+
+    // Create a new instance right before the call to ensure we use the current environment state
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+
     const systemInstruction = `
       You are "Daktari AI", a helpful and knowledgeable pharmaceutical assistant for MediConnect Kenya.
 
@@ -21,19 +33,39 @@ export const generateAIResponse = async (userMessage: string, context?: string):
       Keep responses concise (under 100 words unless detailed explanation needed).
     `;
 
-    // Always use ai.models.generateContent and select the appropriate model for general text tasks.
+    // Using the recommended gemini-3-flash-preview model for general text tasks
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: userMessage,
+      contents: [{ role: 'user', parts: [{ text: userMessage }] }],
       config: {
         systemInstruction: systemInstruction,
         temperature: 0.7,
       }
     });
 
-    return response.text || "I apologize, I couldn't generate a response at this moment.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "I'm having trouble connecting to the server. Please try again.";
+    if (!response.text) {
+      console.warn("Gemini API returned an empty response text.");
+      return "I apologize, but I couldn't generate a helpful response right now. Could you try rephrasing your question?";
+    }
+
+    return response.text;
+  } catch (error: any) {
+    // Log detailed error for debugging
+    console.error("Gemini API Connection Error:", {
+      message: error.message,
+      name: error.name,
+      status: error.status,
+    });
+
+    // Provide a more descriptive error message to the user
+    if (error.message?.includes("API key not valid")) {
+      return "I'm having trouble with my credentials. Please try again in a moment.";
+    }
+
+    if (error.message?.includes("User location is not supported")) {
+      return "I apologize, but the AI service is currently unavailable in your region.";
+    }
+
+    return "I'm having trouble connecting to the AI server. This might be due to a high volume of requests or a temporary network issue. Please try again in a few seconds.";
   }
 };

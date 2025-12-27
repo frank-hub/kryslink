@@ -136,12 +136,6 @@ export const SupplierLayout = ({ children }: PropsWithChildren) => {
                   href="/supplier/finance"
                   active={url.startsWith('/supplier/finance')}
                 />
-                <SidebarItem
-                  icon={FileText}
-                  label="Invoices"
-                  href="/supplier/invoices"
-                  active={url.startsWith('/supplier/invoices')}
-                />
             </div>
 
             <div>

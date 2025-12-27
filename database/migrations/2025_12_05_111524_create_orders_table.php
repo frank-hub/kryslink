@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->json('shipping_address')->nullable();
             $table->json('billing_details')->nullable(); // Stores LPO, KRA PIN at time of order
-            
+
             $table->timestamps();
         });
     }

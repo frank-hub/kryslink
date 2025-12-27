@@ -81,7 +81,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         <nav className="flex-1 px-4 space-y-6 overflow-y-auto">
             <div>
                 <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Overview</p>
-                <SidebarItem icon={LayoutDashboard} label="Dashboard" href="/dashboard" active={url === '/dashboard'} />
+                <SidebarItem icon={LayoutDashboard} label="Dashboard" href="/dashboard/index" active={url === '/dashboard'} />
                 <SidebarItem icon={History} label="Recent Orders" href="/dashboard/orders" active={url.startsWith('/dashboard/orders')} />
             </div>
 
@@ -89,12 +89,10 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
                 <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Procurement</p>
                 <SidebarItem icon={ShoppingCart} label="Marketplace" href="/marketplace" active={false} />
                 <SidebarItem icon={Truck} label="Suppliers" href="/dashboard/suppliers" active={url.startsWith('/dashboard/suppliers')} />
-                <SidebarItem icon={Package} label="Inventory" href="/dashboard/inventory" active={url.startsWith('/dashboard/inventory')} />
             </div>
 
             <div>
                 <p className="px-4 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Finance & Admin</p>
-                <SidebarItem icon={FileText} label="Invoices & ETIMS" href="/dashboard/invoices" active={url.startsWith('/dashboard/invoices')} />
                 <SidebarItem icon={Shield} label="Compliance" href="/dashboard/compliance" active={url.startsWith('/dashboard/compliance')} />
                 <SidebarItem icon={Settings} label="Settings" href="/dashboard/settings" active={url.startsWith('/dashboard/settings')} />
             </div>

@@ -43,6 +43,11 @@ Route::group(['prefix' => 'dashboard'], function () {
         Route::get('/orders', function () {
             return Inertia::render('Dashboard/orders');
         })->name('dashboard.orders');
+
+
+        Route::get('/suppliers', function () {
+            return Inertia::render('Dashboard/suppliers');
+        })->name('dashboard.suppliers');
     });
 Route::group(['middleware' => ['auth', 'verified']], function () {
 
