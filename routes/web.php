@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Supplier\ProductController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -59,6 +60,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::get('/products', function () {
             return Inertia::render('Supplier/Products');
         })->name('supplier.products');
+
+        Route::post('/products/store', [ProductController::class, 'store'])->name('supplier.products.store');
 
         Route::get('/products/create', function () {
             return Inertia::render('Supplier/CreateProduct');
