@@ -114,7 +114,7 @@ class ProductController extends Controller
 
         $product = Product::create($validated);
 
-        return redirect()->route('supplier.products.index')
+        return redirect()->back()
             ->with('success', 'Product created successfully!');
     }
 

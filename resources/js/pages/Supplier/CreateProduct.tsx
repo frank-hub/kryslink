@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
+import axios from 'axios';
 import {
   ArrowLeft, Upload, Info, DollarSign, Package,
   FileText, Image as ImageIcon, Save, X, AlertCircle
@@ -141,9 +142,38 @@ export default function CreateProduct({ categories }: Props) {
     setDocumentNames(newNames);
   };
 
-  const handleSubmit = (e: React.FormEvent, status: 'draft' | 'active') => {
+  const handleSubmit = async(e: React.FormEvent, status: 'draft' | 'active') =>  {
     e.preventDefault();
     setData('status', status);
+
+    try {
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        if (key === 'images' || key === 'documents') {
+          (value as File[]).forEach((file) => {
+            formData.append(key + '[]', file);
+          });
+        } else {
+          formData.append(key, value as string | Blob | boolean);
+        }
+      });
+
+      const response = await axios.post('/supplier/products/store/',formData);
+
+      if (response.status === 200) {
+        alert('Product submitted successfully!');
+
+        reset();
+        setImagePreviews([]);
+        setDocumentNames([]);
+      }else{
+        alert('Error submitting product. Please try again.');
+      }
+
+    } catch (error) {
+      console.error('Error submitting form:', error);
+    }
 
     // Use FormData for file uploads
     // post(route('supplier.products.store'), {
