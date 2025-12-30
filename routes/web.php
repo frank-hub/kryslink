@@ -5,6 +5,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Supplier\ProductController;
+use App\Http\Controllers\Supplier\AuthController;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -15,6 +16,13 @@ Route::get('/', function () {
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 
 Route::post('register',[UserController::class,'register'])->name('user.register');
+
+Route::get('/supplier/auth', function () {
+    return Inertia::render('Supplier/Auth/Auth');
+})->name('supplier.auth');
+
+Route::post('/supplier/login', [AuthController::class, 'login']);
+Route::post('/supplier/register', [AuthController::class, 'register']);
 
 Route::get('/marketplace', function () {
     return Inertia::render('Marketplace');
