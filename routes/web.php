@@ -6,12 +6,9 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Supplier\ProductController;
 use App\Http\Controllers\Supplier\AuthController;
+use App\Http\Controllers\WelcomeController;
 
-Route::get('/', function () {
-    return Inertia::render('welcome', [
-        'canRegister' => Features::enabled(Features::registration()),
-    ]);
-})->name('home');
+Route::get('/', [WelcomeController::class,'index'])->name('home');
 
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 

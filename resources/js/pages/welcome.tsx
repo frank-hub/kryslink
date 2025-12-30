@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router ,usePage} from '@inertiajs/react';
 import axios from 'axios';
 
 import {
@@ -10,18 +10,7 @@ import {
 } from 'lucide-react';
 import { generateAIResponse } from '../services/geminiService';
 import { KENYA_COUNTIES, MOCK_PRODUCTS } from '../constants';
-import { CartItem, ChatMessage, Product , NewUser } from '../../../types';
-// NOTE: Since the user requested the Welcome page to be self-contained but we also have a Layout,
-// we will duplicate the "Shell" logic here to ensure it works standalone as requested previously,
-// OR better, we will wrap the content in the same structural divs.
-// However, to keep it simple and consistent with the "Layout" request, we will duplicate the specialized Navbar for the Landing page if needed,
-// but for now, reusing the Logic is best.
-// The previous prompt asked for Welcome.tsx to be self-contained.
-// We will use the Components defined in Layout.tsx to avoid massive code duplication if we were refactoring,
-// but since this is a specific file request, I will include the necessary parts to make it function.
-
-// However, to make the "Add to Cart" work seamlessly with the other pages which use Layout.tsx,
-// this page should ALSO write to localStorage or use the same event system.
+import { CartItem, ChatMessage, Product , NewUser, Page } from '../../../types';
 
 
 const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
@@ -485,11 +474,28 @@ export default function Welcome() {
     router.visit('/marketplace');
   };
 
-  const featuredProducts = MOCK_PRODUCTS.slice(0, 8); // Display top 8 products
 
   const addToCart = (product: Product) => {
     window.dispatchEvent(new CustomEvent('add-to-cart', { detail: product }));
   };
+  interface PageProps {
+  auth?: {
+    user?: any;
+  };
+  canRegister: boolean;
+  products: Product[];
+  stats: {
+    total_products: number;
+    total_suppliers: number;
+    verified_products: number;
+  };
+}
+
+  const {canRegister,products , stats} = usePage<PageProps>().props;
+  console.log('Welcome Page Props:', { canRegister, products, stats });
+    const featuredProducts = products.slice(0, 8);
+    // const featuredProducts = MOCK_PRODUCTS.slice(0, 8); // mOCK PRODUCTS
+
 
   return (
     <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-slate-50">
