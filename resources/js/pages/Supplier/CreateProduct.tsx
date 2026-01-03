@@ -154,8 +154,10 @@ export default function CreateProduct({ categories }: Props) {
           (value as File[]).forEach((file) => {
             formData.append(key + '[]', file);
           });
+        } else if (typeof value === 'boolean') {
+          formData.append(key, value ? '1' : '0');
         } else {
-          formData.append(key, value as string | Blob | boolean);
+          formData.append(key, value as string | Blob);
         }
       });
 
