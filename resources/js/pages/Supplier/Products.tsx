@@ -1,20 +1,34 @@
 
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import React, { use } from 'react';
+import { Head, Link,usePage } from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
 import {
   Plus, Search, Filter, MoreVertical, Edit2,
   Trash2, AlertTriangle, PackageCheck
 } from 'lucide-react';
 import { MOCK_PRODUCTS } from '../../constants';
-
+import type { Product ,Stats,Paginated } from './Types';
 export default function SupplierProducts() {
   // Use mock products but pretend they belong to the supplier
-  const products = MOCK_PRODUCTS.slice(0, 8).map(p => ({
-    ...p,
-    status: p.stock > 0 ? 'Active' : 'Out of Stock',
-    sku: `SKU-${Math.floor(Math.random() * 10000)}`
-  }));
+
+  interface ProductProps{
+    products : Paginated<Product>;
+    stats: Stats;
+  }
+
+  const { products, stats } = usePage<ProductProps>().props;
+
+  const initialProducts = products.data;
+
+
+  console.log('image:', products.data[0]);
+
+
+//   const products = MOCK_PRODUCTS.slice(0, 8).map(p => ({
+//     ...p,
+//     status: p.stock > 0 ? 'Active' : 'Out of Stock',
+//     sku: `SKU-${Math.floor(Math.random() * 10000)}`
+//   }));
 
   return (
     <SupplierLayout>
@@ -37,15 +51,15 @@ export default function SupplierProducts() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center">
               <div className="p-3 bg-blue-50 rounded-lg text-blue-600 mr-4"><PackageCheck className="h-6 w-6" /></div>
-              <div><p className="text-sm text-slate-500 font-medium">Total Products</p><p className="text-2xl font-bold text-slate-900">142</p></div>
+              <div><p className="text-sm text-slate-500 font-medium">Total Products</p><p className="text-2xl font-bold text-slate-900">{stats.total}</p></div>
           </div>
           <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center">
               <div className="p-3 bg-amber-50 rounded-lg text-amber-600 mr-4"><AlertTriangle className="h-6 w-6" /></div>
-              <div><p className="text-sm text-slate-500 font-medium">Low Stock</p><p className="text-2xl font-bold text-slate-900">12</p></div>
+              <div><p className="text-sm text-slate-500 font-medium">Low Stock</p><p className="text-2xl font-bold text-slate-900">{stats.low_stock}</p></div>
           </div>
           <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex items-center">
               <div className="p-3 bg-red-50 rounded-lg text-red-600 mr-4"><AlertTriangle className="h-6 w-6" /></div>
-              <div><p className="text-sm text-slate-500 font-medium">Out of Stock</p><p className="text-2xl font-bold text-slate-900">3</p></div>
+              <div><p className="text-sm text-slate-500 font-medium">Out of Stock</p><p className="text-2xl font-bold text-slate-900">{stats.out_of_stock}</p></div>
           </div>
       </div>
 
@@ -93,13 +107,13 @@ export default function SupplierProducts() {
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                    {products.map((product) => (
+                    {initialProducts.map((product) => (
                         <tr key={product.id} className="hover:bg-slate-50 transition-colors group">
                              <td className="px-6 py-4"><input type="checkbox" className="rounded border-slate-300 text-[#0d9488] focus:ring-[#0d9488]" /></td>
                             <td className="px-6 py-4">
                                 <div className="flex items-center">
                                     <div className="h-10 w-10 flex-shrink-0 bg-white rounded-lg border border-slate-200 p-1 mr-3">
-                                        <img src={product.image} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+                                        <img src={product.images} alt="" className="h-full w-full object-contain mix-blend-multiply" />
                                     </div>
                                     <div>
                                         <div className="font-medium text-slate-900">{product.name}</div>
@@ -107,7 +121,7 @@ export default function SupplierProducts() {
                                     </div>
                                 </div>
                             </td>
-                            <td className="px-6 py-4 text-slate-600">{product.category}</td>
+                            <td className="px-6 py-4 text-slate-600">{product.category.name}</td>
                             <td className="px-6 py-4 font-medium text-slate-900">KES {product.price.toLocaleString()}</td>
                             <td className="px-6 py-4">
                                 <div className="flex items-center">

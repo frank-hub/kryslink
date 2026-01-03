@@ -47,7 +47,7 @@ class ProductController extends Controller
             'out_of_stock' => Product::where('supplier_id', Auth::id())->outOfStock()->count(),
         ];
 
-        return Inertia::render('Supplier/Products/Index', [
+        return Inertia::render('Supplier/Products', [
             'products' => $products,
             'stats' => $stats,
             'filters' => $request->only(['search', 'status', 'category']),
