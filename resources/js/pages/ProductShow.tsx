@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link,usePage } from '@inertiajs/react';
 import { ArrowLeft, Shield, FileCheck, Truck, CheckCircle, Star, Building2, Package } from 'lucide-react';
 import { Layout } from './Layout';
 import { MOCK_PRODUCTS } from '../constants';
@@ -10,8 +10,33 @@ export default function ProductShow() {
   // For this static preview, we attempt to find the ID from the URL.
   const path = window.location.pathname;
   const id = path.split('/').pop();
-  const product = MOCK_PRODUCTS.find(p => p.id === id) || MOCK_PRODUCTS[0];
+//   const product = MOCK_PRODUCTS.find(p => p.id === id) || MOCK_PRODUCTS[0];
+interface Supplier {
+  name: string;
+  organization_name: string;
+  contact_email: string;
+}
 
+interface ProductData {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  stock: number;
+  image: string;
+  supplier: Supplier;
+  rating: number;
+  verified: boolean;
+}
+
+interface PageProps {
+  product: ProductData;
+  auth?: {
+    user?: any;
+  };
+}
+const { product ,auth } = usePage<PageProps>().props;
   const addToCart = () => {
     window.dispatchEvent(new CustomEvent('add-to-cart', { detail: product }));
   };
@@ -42,7 +67,7 @@ export default function ProductShow() {
                       <h1 className="text-3xl font-bold text-slate-900 mb-2 leading-tight">{product.name}</h1>
                       <div className="flex items-center text-slate-500 text-sm mb-6"><span>Pack Size: 1 Box</span><span className="mx-2">•</span><span>Generic Name: {product.name.split(' ')[0]}</span></div>
                       <div className="mb-8"><p className="text-sm text-slate-500 font-medium mb-1">Wholesale Price (VAT Inclusive)</p><div className="flex items-baseline"><span className="text-4xl font-bold text-slate-900 tracking-tight">KES {product.price.toLocaleString()}</span></div></div>
-                      <div className="bg-slate-50 rounded-xl p-4 mb-8 border border-slate-100"><div className="flex items-start"><div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center text-slate-400 shadow-sm border border-slate-100"><Building2 className="h-6 w-6" /></div><div className="ml-3 flex-1"><div className="flex justify-between items-start"><div><p className="text-sm font-bold text-slate-900">{product.supplier}</p><p className="text-xs text-slate-500">Licensed Distributor • Nairobi</p></div><div className="flex flex-col items-end"><span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium mb-1 border border-green-200">KRA Compliant</span></div></div></div></div></div>
+                      <div className="bg-slate-50 rounded-xl p-4 mb-8 border border-slate-100"><div className="flex items-start"><div className="h-12 w-12 bg-white rounded-lg flex items-center justify-center text-slate-400 shadow-sm border border-slate-100"><Building2 className="h-6 w-6" /></div><div className="ml-3 flex-1"><div className="flex justify-between items-start"><div><p className="text-sm font-bold text-slate-900">{product.name}</p><p className="text-xs text-slate-500">Licensed Distributor • Nairobi</p></div><div className="flex flex-col items-end"><span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium mb-1 border border-green-200">KRA Compliant</span></div></div></div></div></div>
                       <div className="space-y-4">
                           <div className="flex items-center justify-between text-sm"><div className="flex items-center text-slate-700"><Package className="h-4 w-4 mr-2" /> Stock Status</div><span className={product.stock > 100 ? "text-emerald-600 font-bold" : "text-amber-500 font-bold"}>{product.stock > 0 ? 'In Stock' : 'Out of Stock'}</span></div>
                           <button onClick={addToCart} className="w-full bg-[#0d9488] hover:bg-[#0f766e] text-white text-lg font-semibold py-4 rounded-xl shadow-lg shadow-teal-500/20 hover:shadow-xl transition-all active:scale-[0.98] flex items-center justify-center">Add to Purchase Order</button>

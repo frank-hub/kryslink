@@ -9,6 +9,7 @@ use App\Http\Controllers\Supplier\AuthController;
 use App\Http\Controllers\WelcomeController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
+Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
 
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 

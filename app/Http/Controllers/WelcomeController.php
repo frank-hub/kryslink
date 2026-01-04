@@ -55,4 +55,32 @@ class WelcomeController extends Controller
             'stats' => $stats,
         ]);
     }
+
+    public function show($id)
+    {
+        $product = Product::with(['category', 'supplier'])
+            ->active()
+            ->verified()
+            ->inStock()
+            ->findOrFail($id);
+
+        $productDetails = [
+            'id' => $product->id,
+            'name' => $product->name,
+            'category' => $product->category->name ?? 'Uncategorized',
+            'description' => $product->description,
+            'price' => $product->price,
+            'stock' => $product->stock,
+            'image' => $product->image,
+            'supplier' => $product->supplier->name,
+            'rating' => $product->rating,
+            'verified' => $product->is_verified,
+        ];
+
+        // dd($productDetails);
+
+        return Inertia::render('ProductShow', [
+            'product' => $productDetails,
+        ]);
+    }
 }

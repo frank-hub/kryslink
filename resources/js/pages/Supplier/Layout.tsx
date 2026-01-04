@@ -58,7 +58,7 @@ export const SupplierLayout = ({ children }: PropsWithChildren) => {
                 <ShieldCheck className="h-6 w-6 text-white" />
               </div>
               <div>
-                  <span className="text-lg font-bold text-slate-800 tracking-tight block leading-none">MediConnect</span>
+                  <span className="text-lg font-bold text-slate-800 tracking-tight block leading-none">KrysLink</span>
                   <span className="text-[10px] font-bold text-[#0d9488] tracking-widest uppercase">Supplier Portal</span>
               </div>
            </Link>

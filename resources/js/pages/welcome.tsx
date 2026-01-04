@@ -492,7 +492,7 @@ export default function Welcome() {
 }
 
   const {canRegister,products , stats} = usePage<PageProps>().props;
-  console.log('Welcome Page Props:', { canRegister, products, stats });
+//   console.log('Welcome Page Props:', { canRegister, products, stats });
     const featuredProducts = products.slice(0, 8);
     // const featuredProducts = MOCK_PRODUCTS.slice(0, 8); // mOCK PRODUCTS
 
@@ -618,7 +618,7 @@ export default function Welcome() {
                                   </span>
                                   <div className="flex items-center text-amber-400">
                                       <Star className="h-3.5 w-3.5 fill-current" />
-                                      <span className="text-xs font-medium text-slate-500 ml-1">{product.rating}</span>
+                                      <span className="text-xs font-medium text-slate-500 ml-1">5/5</span>
                                   </div>
                               </div>
 
