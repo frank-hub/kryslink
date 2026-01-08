@@ -11,8 +11,8 @@ use App\Http\Controllers\WelcomeController;
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
 
+Route::get('login',[UserController::class,'Customerlogin'])->name('customer.login');
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
-
 Route::post('register',[UserController::class,'register'])->name('user.register');
 
 Route::get('/supplier/auth', function () {

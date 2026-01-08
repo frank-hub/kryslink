@@ -6,7 +6,8 @@ import axios from 'axios';
 import {
   Search, MapPin, ShieldCheck, CheckCircle, TrendingUp, Building2, Truck,
   ShoppingCart, Menu, X, Trash2, ShoppingBag, MessageSquare,
-  Send, Bot, Loader2, Phone, Mail, Star, Plus, User
+  Send, Bot, Loader2, Phone, Mail, Star, Plus, User,
+  LogIn
 } from 'lucide-react';
 import { generateAIResponse } from '../services/geminiService';
 import { KENYA_COUNTIES, MOCK_PRODUCTS } from '../constants';
@@ -53,12 +54,11 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
                  <User className="h-5 w-5" />
                </Link>
             ) : (
-              <button
-                onClick={onAuthOpen}
+              <a href='/login'
                 className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#0d9488] hover:bg-[#0f766e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0d9488]"
               >
-                Sign In
-              </button>
+                Create Account
+              </a>
             )}
 
             <button
@@ -363,6 +363,7 @@ const handleLogin = async() => {
                                         {KENYA_COUNTIES.map(c => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                </div>
+
                              </>
                           )}
                           <input type="email"
@@ -373,11 +374,14 @@ const handleLogin = async() => {
                           value={newUser.password}
                           onChange={(e) => setNewUser({...newUser,password: e.target.value})}
                            className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Password" required />
-                           <input type="password_confirmation"
-                          value={newUser.password_confirmation}
-                          onChange={(e) => setNewUser({...newUser,password_confirmation: e.target.value})}
-                           className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Confirm Password" required />
-                          <button type="submit"
+                           {!isLogin &&(
+                                <input type="password_confirmation"
+                                value={newUser.password_confirmation}
+                                onChange={(e) => setNewUser({...newUser,password_confirmation: e.target.value})}
+                                className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm" placeholder="Confirm Password" required />
+                           )}
+
+                           <button type="submit"
                           onClick={() => {  handleNewUser(); }}
                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0d9488] hover:bg-[#0f766e]">{isLogin ? 'Sign In' : 'Submit for Verification'}</button>
                       </form>

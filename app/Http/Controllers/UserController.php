@@ -21,6 +21,11 @@ class UserController extends Controller
             ]
         ]);
 
+
+    }
+    public function Customerlogin()
+    {
+        return Inertia::render('AuthCustomer');
     }
 
     public function update(Request $request)
@@ -90,10 +95,45 @@ class UserController extends Controller
             'password' => ['required'],
         ]);
 
+
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return Inertia::render('Dashboard/index');
+            $user = Auth::user();
+
+            // Determine redirect URL based on role
+            $redirectUrl = match($user->role) {
+                'SUPPLIER' => '/supplier/dashboard',
+                'CUSTOMER' => '/dashboard/index',
+                'ADMIN' => '/dashboard',
+                default => '/marketplace',
+            };
+
+            // Return JSON response for axios
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'redirect' => $redirectUrl,
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'role' => $user->role,
+                    ],
+                ]);
+            }
+
+            // Traditional redirect
+            return redirect()->intended($redirectUrl);
+        }
+
+        // Handle failed login
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $credentials,
+            ], 401);
         }
 
         return back()->withErrors([

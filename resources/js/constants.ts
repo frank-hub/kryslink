@@ -145,7 +145,19 @@ export const MOCK_PRODUCTS: Product[] = [
     stock: 100,
     rating: 4.9,
     verified: true,
-  }
+  },
+    {
+    id: '13',
+    name: 'Panadol Extra (Box of 100)',
+    category: 'Pain Relief',
+    price: 2100,
+    supplier: 'Sigs Medical Supplies',
+    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=800',
+    description: 'Original Panadol Extra for strong pain relief. Bulk pack suitable for pharmacy retail.',
+    stock: 100,
+    rating: 3.9,
+    verified: true,
+  },
 ];
 
 export const KENYA_COUNTIES = [
