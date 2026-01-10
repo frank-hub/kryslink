@@ -7,15 +7,19 @@ import { GoogleGenAI } from "@google/genai";
  * which is critical for environments where the key might be injected or updated dynamically.
  */
 export const generateAIResponse = async (userMessage: string, context?: string): Promise<string> => {
+
+
   try {
     // Check if API key is available
-    if (!process.env.API_KEY) {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+    if (!apiKey) {
       console.error("Gemini API Error: API_KEY is missing from the environment.");
       return "System configuration error: API key is missing. Please contact support.";
     }
 
     // Create a new instance right before the call to ensure we use the current environment state
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: 'AIzaSyBqOBFhiGlsZt-ztwPt8yOMfUkx76Gl2Dg' });
 
     const systemInstruction = `
       You are "Daktari AI", a helpful and knowledgeable pharmaceutical assistant for MediConnect Kenya.
