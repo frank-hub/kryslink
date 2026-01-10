@@ -33,6 +33,21 @@ class OrderController extends Controller
      */
     public function create(Request $request)
     {
+        Auth::user(); // Ensure user is authenticated
+        $user = Auth::user();
+        
+        return Inertia::render('Checkout', [
+            'cart' => $request->session()->get('cart', []),
+            'user' => $user,
+        ]);
+
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
         $request->validate([
             'cart' => 'required|array',
             'shipping_address' => 'required|array',
@@ -91,14 +106,6 @@ class OrderController extends Controller
             DB::rollBack();
             return back()->withErrors(['error' => 'Failed to place order. ' . $e->getMessage()]);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
     }
 
     /**

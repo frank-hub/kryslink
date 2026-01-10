@@ -1,12 +1,23 @@
 
 import React, { useState, useEffect } from 'react';
-import { Head, router } from '@inertiajs/react';
+import { Head, router ,usePage } from '@inertiajs/react';
 import { ShieldCheck, Truck, CreditCard, CheckCircle, FileText } from 'lucide-react';
 import { Layout } from './Layout';
 import { CartItem } from '../../../types';
 
 export default function Checkout() {
   const [cart, setCart] = useState<CartItem[]>([]);
+
+  interface PageProps {
+    cart: CartItem[];
+    user: {
+      organization_name: string;
+      email: string;
+      kra_pin?: string;
+    };
+  }
+
+  const { user } = usePage<PageProps>().props;
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('mediconnect_cart') : null;
@@ -51,16 +62,16 @@ export default function Checkout() {
                     <div className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">Organization Name</label>
-                            <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="e.g. City General Hospital" />
+                            <input type="text" disabled value={user.organization_name} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="e.g. City General Hospital" />
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-slate-700 mb-1">KRA PIN</label>
-                                <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="P00..." />
+                                <input type="text" disabled value={user.kra_pin} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="P00..." />
                             </div>
                              <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">LPO Number (Optional)</label>
-                                <input type="text" className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="LPO-2024-..." />
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                                <input type="text" disabled value={user.email} className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="LPO-2024-..." />
                             </div>
                         </div>
                     </div>
@@ -75,9 +86,11 @@ export default function Checkout() {
                      <div className="space-y-4">
                         <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Street Address / Building" />
                         <div className="grid grid-cols-2 gap-4">
-                            <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="City" />
+                            <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Town" />
                              <select className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5">
                                  <option>Nairobi</option>
+                                 <option>Kiambu</option>
+                                 <option>Kajiado</option>
                                  <option>Mombasa</option>
                                  <option>Kisumu</option>
                                  <option>Nakuru</option>

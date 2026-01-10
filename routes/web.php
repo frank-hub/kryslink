@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -11,7 +12,7 @@ use App\Http\Controllers\WelcomeController;
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
 
-Route::get('login',[UserController::class,'Customerlogin'])->name('customer.login');
+Route::get('login',[UserController::class,'Customerlogin'])->name('login');
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 Route::post('register',[UserController::class,'register'])->name('user.register');
 
@@ -26,9 +27,10 @@ Route::get('/marketplace', function () {
     return Inertia::render('Marketplace');
 })->name('marketplace');
 
-Route::get('/checkout', function () {
-    return Inertia::render('Checkout');
-})->name('checkout');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/checkout',[OrderController::class,'create'])->name('checkout');
+    Route::post('/orders/store',[OrderController::class,'store'])->name('orders.store');
+});
 
 Route::get('/cart', function () {
     return Inertia::render('Cart');
