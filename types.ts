@@ -3,7 +3,7 @@ export interface Product {
   name: string;
   category: string;
   price: number;
-  supplier: string;
+  supplier_id: string;
   image: string;
   description: string;
   stock: number;
@@ -35,6 +35,14 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: Date;
+}
+
+export interface ShippingInfo {
+    street : string
+    town: string
+    county: string
+    contact_person: string
+    phone: string
 }
 
 export enum Page {

@@ -35,7 +35,7 @@ class OrderController extends Controller
     {
         Auth::user(); // Ensure user is authenticated
         $user = Auth::user();
-        
+
         return Inertia::render('Checkout', [
             'cart' => $request->session()->get('cart', []),
             'user' => $user,

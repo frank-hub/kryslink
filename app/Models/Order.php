@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Order extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
         'order_reference',
         'user_id',
@@ -29,6 +29,11 @@ class Order extends Model
         'tax' => 'decimal:2',
         'total_amount' => 'decimal:2',
     ];
+
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
+    }
 
     public function user()
     {

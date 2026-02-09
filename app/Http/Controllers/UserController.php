@@ -85,7 +85,7 @@ class UserController extends Controller
             return redirect('/supplier/dashboard');
         }
 
-        return Inertia::render('Dashboard/index');
+        return Inertia::render('Checkout');
     }
 
     public function login(Request $request)
@@ -104,7 +104,7 @@ class UserController extends Controller
             // Determine redirect URL based on role
             $redirectUrl = match($user->role) {
                 'SUPPLIER' => '/supplier/dashboard',
-                'CUSTOMER' => '/dashboard/index',
+                'CUSTOMER' => '/marketplace',
                 'ADMIN' => '/dashboard',
                 default => '/marketplace',
             };
@@ -139,6 +139,16 @@ class UserController extends Controller
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->onlyInput('email');
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/marketplace');
     }
 }
 

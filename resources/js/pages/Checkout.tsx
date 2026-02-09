@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Head, router ,usePage } from '@inertiajs/react';
 import { ShieldCheck, Truck, CreditCard, CheckCircle, FileText } from 'lucide-react';
 import { Layout } from './Layout';
-import { CartItem } from '../../../types';
-
+import { CartItem, ShippingInfo } from '../../../types';
 export default function Checkout() {
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -19,6 +18,14 @@ export default function Checkout() {
 
   const { user } = usePage<PageProps>().props;
 
+const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
+  street: '',
+  town: '',
+  county: '',
+  contact_person: '',
+  phone: '',
+});
+
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? localStorage.getItem('mediconnect_cart') : null;
     if (saved) setCart(JSON.parse(saved));
@@ -28,9 +35,56 @@ export default function Checkout() {
   const vat = subtotal * 0.16;
   const total = subtotal + vat;
 
+
+    // Generic handler for text inputs
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setShippingInfo(prev => ({
+        ...prev,
+        [name]: value
+    }));
+    };
+
+    // Handler for the county dropdown
+    const handleCountyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setShippingInfo(prev => ({
+        ...prev,
+        county: e.target.value
+    }));
+    };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate processing
+
+    if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+    }
+
+
+    const response = router.post('/orders/store', {
+        cart: cart.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+        })),
+        shipping_address: {
+            street: shippingInfo.street,
+            town: shippingInfo.town,
+            county: shippingInfo.county,
+            contact_person: shippingInfo.contact_person,
+            phone: shippingInfo.phone,
+        },
+        billing_details: {
+            organization_name: user.organization_name,
+            email: user.email,
+            kra_pin: user.kra_pin || '',
+        },
+        payment_method: 'M-PESA',
+    });
+
+
     setTimeout(() => {
         // Clear cart
         localStorage.removeItem('mediconnect_cart');
@@ -84,10 +138,11 @@ export default function Checkout() {
                         Delivery Address
                     </div>
                      <div className="space-y-4">
-                        <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Street Address / Building" />
+                        <input type="text" name='street' onChange={handleInputChange} value={shippingInfo.street} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Street Address / Building" />
                         <div className="grid grid-cols-2 gap-4">
-                            <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Town" />
-                             <select className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5">
+                            <input type="text" name='town' onChange={handleInputChange} value={shippingInfo.town} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Town" />
+                             <select name='county' value={shippingInfo.county} onChange={handleCountyChange}  className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5">
+                                 <option value="">Select County</option>
                                  <option>Nairobi</option>
                                  <option>Kiambu</option>
                                  <option>Kajiado</option>
@@ -97,8 +152,8 @@ export default function Checkout() {
                              </select>
                         </div>
                          <div className="grid grid-cols-2 gap-4">
-                             <input type="text" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Contact Person" />
-                             <input type="tel" required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Phone Number" />
+                             <input type="text" name='contact_person' onChange={handleInputChange} value={shippingInfo.contact_person} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Contact Person" />
+                             <input type="tel" name='phone' onChange={handleInputChange} value={shippingInfo.phone} required className="w-full rounded-lg border-slate-300 focus:border-[#0d9488] focus:ring-[#0d9488] sm:text-sm py-2.5" placeholder="Phone Number" />
                         </div>
                     </div>
                 </div>
@@ -114,10 +169,14 @@ export default function Checkout() {
                             <input type="radio" name="payment" defaultChecked className="h-4 w-4 text-[#0d9488] focus:ring-[#0d9488]" />
                             <div className="ml-3">
                                 <span className="block text-sm font-medium text-slate-900">M-PESA / Mobile Money</span>
-                                <span className="block text-xs text-slate-500">Instant confirmation via STK Push</span>
+                                {/* <span className="block text-xs text-slate-500">Instant confirmation via STK Push</span> */}
+                                <p>
+                                    Mpesa Paybill Number: <span className="font-bold text-slate-800">880100</span><br />
+                                    Account Number: <span className="font-bold text-slate-800">Kryslink</span>
+                                </p>
                             </div>
                         </label>
-                        <label className="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-all">
+                        {/* <label className="flex items-center p-4 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-all">
                             <input type="radio" name="payment" className="h-4 w-4 text-[#0d9488] focus:ring-[#0d9488]" />
                             <div className="ml-3">
                                 <span className="block text-sm font-medium text-slate-900">Bank Transfer / EFT</span>
@@ -130,7 +189,7 @@ export default function Checkout() {
                                 <span className="block text-sm font-medium text-slate-900">Credit 30 Days</span>
                                 <span className="block text-xs text-slate-500">Subject to credit limit approval</span>
                             </div>
-                        </label>
+                        </label> */}
                     </div>
                 </div>
             </div>

@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
 import {
   Search, Filter, Download, Eye, Truck, CheckCircle,
@@ -8,20 +7,60 @@ import {
   MapPin, ClipboardList, Info, RefreshCw
 } from 'lucide-react';
 
-export default function SupplierOrders() {
+interface Order {
+  id: string;
+  order_id: number; // ADD THIS - the actual database ID
+  customer: string;
+  date: string;
+  amount: number;
+  payment: string;
+  status: string;
+  items: number;
+}
+
+interface OrdersPageProps {
+  orders: Order[];
+}
+
+export interface ShipmentFormData {
+  order_id: number;
+  carrier: 'Fargo Courier' | 'Wells Fargo' | 'In-House Delivery' | 'G4S Logistics';
+  tracking_number: string;
+  estimated_arrival: string;
+  current_location: string;
+}
+
+export interface Shipment {
+  id: string;
+  order_ref: string;
+  customer: string;
+  carrier: string;
+  tracking_number: string;
+  status: 'dispatched' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'exception';
+  current_location: string;
+  estimated_arrival: string;
+  created_at: string;
+}
+
+export default function SupplierOrders({orders}: OrdersPageProps) {
   const [activeTab, setActiveTab] = useState('All');
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const orders = [
-    { id: 'ORD-7782', customer: 'City Square Pharmacy', date: 'Oct 24, 2023', amount: 45000, payment: 'Paid', status: 'Pending', items: 12 },
-    { id: 'ORD-7781', customer: 'Westlands Health Centre', date: 'Oct 24, 2023', amount: 128000, payment: 'Paid', status: 'Processing', items: 45 },
-    { id: 'ORD-7780', customer: 'MediLife Hospital', date: 'Oct 23, 2023', amount: 24500, payment: 'Pending', status: 'Shipped', items: 8 },
-    { id: 'ORD-7779', customer: 'GoodHope Chemists', date: 'Oct 22, 2023', amount: 8900, payment: 'Paid', status: 'Delivered', items: 3 },
-    { id: 'ORD-7778', customer: 'Nairobi West Hosp.', date: 'Oct 21, 2023', amount: 210000, payment: 'Failed', status: 'Cancelled', items: 62 },
-    { id: 'ORD-7775', customer: 'Afya Centre Pharmacy', date: 'Oct 20, 2023', amount: 56000, payment: 'Paid', status: 'Delivered', items: 15 },
-  ];
+  // ADD THIS - Form for updating order status
+  const statusForm = useForm({
+    status: '',
+  });
+
+  // ADD THIS - Form for creating shipment
+  const { data, setData, post, processing, errors, reset } = useForm<ShipmentFormData>({
+    order_id: 0,
+    carrier: 'Fargo Courier',
+    tracking_number: '',
+    estimated_arrival: '',
+    current_location: '',
+  });
 
   const getStatusColor = (status: string) => {
     switch(status) {
@@ -34,14 +73,48 @@ export default function SupplierOrders() {
     }
   };
 
-  const handleOpenDispatch = (order: any) => {
+  // MODIFY THIS
+  const handleOpenDispatch = (order: Order) => {
     setSelectedOrder(order);
+    setData({
+      order_id: order.order_id, // Use the actual database ID
+      carrier: 'Fargo Courier',
+      tracking_number: '',
+      estimated_arrival: '',
+      current_location: '',
+    });
     setIsDispatchModalOpen(true);
   };
 
-  const handleOpenUpdateStatus = (order: any) => {
+  const handleOpenUpdateStatus = (order: Order) => {
     setSelectedOrder(order);
     setIsStatusModalOpen(true);
+  };
+
+  // ADD THIS - Handle shipment submission
+  const handleSubmitShipment = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.post('supplier.shipments.store'), {
+      onSuccess: () => {
+        setIsDispatchModalOpen(false);
+        reset();
+        setSelectedOrder(null);
+      },
+    };
+  };
+
+  // ADD THIS - Handle status update
+  const handleUpdateStatus = (newStatus: string) => {
+    if (!selectedOrder) return;
+
+    router.patch(router('orders.update-status', selectedOrder.order_id), {
+      status: newStatus,
+    }, {
+      onSuccess: () => {
+        setIsStatusModalOpen(false);
+        setSelectedOrder(null);
+      },
+    });
   };
 
   return (
@@ -170,24 +243,22 @@ export default function SupplierOrders() {
                         <div className="space-y-3">
                              <p className="text-sm font-bold text-slate-700 mb-2">Select New Status</p>
                              {[
-                                { id: 'Pending', icon: Clock, color: 'text-amber-500', desc: 'Order received, waiting for confirmation.' },
-                                { id: 'Processing', icon: ClipboardList, color: 'text-blue-500', desc: 'Items are being picked and packed.' },
-                                { id: 'Delivered', icon: CheckCircle, color: 'text-emerald-500', desc: 'Medicine has reached the pharmacy.' },
-                                { id: 'Cancelled', icon: XCircle, color: 'text-red-500', desc: 'Order will be terminated.' }
+                                { id: 'pending', label: 'Pending', icon: Clock, color: 'text-amber-500', desc: 'Order received, waiting for confirmation.' },
+                                { id: 'processing', label: 'Processing', icon: ClipboardList, color: 'text-blue-500', desc: 'Items are being picked and packed.' },
+                                { id: 'delivered', label: 'Delivered', icon: CheckCircle, color: 'text-emerald-500', desc: 'Medicine has reached the pharmacy.' },
+                                { id: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'text-red-500', desc: 'Order will be terminated.' }
                              ].map((item) => (
                                 <button
                                     key={item.id}
-                                    onClick={() => {
-                                        console.log(`Update ${selectedOrder.id} to ${item.id}`);
-                                        setIsStatusModalOpen(false);
-                                    }}
-                                    className="w-full flex items-center p-3 rounded-xl border border-slate-200 hover:border-[#0d9488] hover:bg-teal-50 transition-all text-left group"
+                                    onClick={() => handleUpdateStatus(item.id)}
+                                    disabled={statusForm.processing}
+                                    className="w-full flex items-center p-3 rounded-xl border border-slate-200 hover:border-[#0d9488] hover:bg-teal-50 transition-all text-left group disabled:opacity-50"
                                 >
                                     <div className={`p-2 rounded-lg bg-white shadow-sm border border-slate-100 mr-4 ${item.color}`}>
                                         <item.icon className="h-5 w-5" />
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-bold text-slate-900 group-hover:text-[#0d9488]">{item.id}</p>
+                                        <p className="text-sm font-bold text-slate-900 group-hover:text-[#0d9488]">{item.label}</p>
                                         <p className="text-[10px] text-slate-500">{item.desc}</p>
                                     </div>
                                     <div className="h-4 w-4 border-2 border-slate-300 rounded-full group-hover:border-[#0d9488]"></div>
@@ -203,7 +274,7 @@ export default function SupplierOrders() {
         </div>
       )}
 
-      {/* 2. Dispatch Order / Create Shipment Modal */}
+      {/* 2. Dispatch Order / Create Shipment Modal - MODIFIED */}
       {isDispatchModalOpen && selectedOrder && (
         <div className="fixed inset-0 z-[100] overflow-y-auto">
             <div className="flex min-h-screen items-center justify-center p-4">
@@ -219,63 +290,105 @@ export default function SupplierOrders() {
                         </button>
                     </div>
 
-                    <div className="p-6 space-y-6">
-                        <div className="flex items-start p-4 bg-teal-50 rounded-xl border border-teal-100">
-                            <Info className="h-5 w-5 text-[#0d9488] mr-3 mt-0.5 flex-shrink-0" />
-                            <div className="text-xs text-[#0f766e] leading-relaxed">
-                                Creating a shipment will notify <strong>{selectedOrder.customer}</strong> and provide them with real-time tracking updates. Ensure the medicine is properly packed.
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <label className="block text-sm font-bold text-slate-800">Logistics Carrier</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {['Fargo Courier', 'Wells Fargo', 'In-House Delivery', 'G4S Logistics'].map(carrier => (
-                                    <button key={carrier} className="flex flex-col items-center justify-center p-3 border border-slate-200 rounded-xl hover:border-[#0d9488] hover:bg-teal-50 transition-all text-center group">
-                                        <Truck className="h-6 w-6 text-slate-400 group-hover:text-[#0d9488] mb-2" />
-                                        <span className="text-xs font-semibold text-slate-600 group-hover:text-[#0d9488]">{carrier}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Tracking Number / Waybill</label>
-                                <div className="relative">
-                                    <ClipboardList className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                    <input type="text" className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]" placeholder="e.g. FG-882910" />
+                    {/* WRAP IN FORM TAG */}
+                    <form onSubmit={handleSubmitShipment}>
+                        <div className="p-6 space-y-6">
+                            <div className="flex items-start p-4 bg-teal-50 rounded-xl border border-teal-100">
+                                <Info className="h-5 w-5 text-[#0d9488] mr-3 mt-0.5 flex-shrink-0" />
+                                <div className="text-xs text-[#0f766e] leading-relaxed">
+                                    Creating a shipment will notify <strong>{selectedOrder.customer}</strong> and provide them with real-time tracking updates. Ensure the medicine is properly packed.
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-4">
+                                <label className="block text-sm font-bold text-slate-800">Logistics Carrier</label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    {(['Fargo Courier', 'Wells Fargo', 'In-House Delivery', 'G4S Logistics'] as const).map(carrier => (
+                                        <button
+                                            key={carrier}
+                                            type="button"
+                                            onClick={() => setData('carrier', carrier)}
+                                            className={`flex flex-col items-center justify-center p-3 border rounded-xl transition-all text-center group ${
+                                                data.carrier === carrier
+                                                    ? 'border-[#0d9488] bg-teal-50'
+                                                    : 'border-slate-200 hover:border-[#0d9488] hover:bg-teal-50'
+                                            }`}
+                                        >
+                                            <Truck className={`h-6 w-6 mb-2 ${data.carrier === carrier ? 'text-[#0d9488]' : 'text-slate-400 group-hover:text-[#0d9488]'}`} />
+                                            <span className={`text-xs font-semibold ${data.carrier === carrier ? 'text-[#0d9488]' : 'text-slate-600 group-hover:text-[#0d9488]'}`}>{carrier}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                                {errors.carrier && <p className="text-xs text-red-500 mt-1">{errors.carrier}</p>}
+                            </div>
+
+                            <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Estimated Arrival</label>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Tracking Number / Waybill</label>
                                     <div className="relative">
-                                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                        <input type="date" className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]" />
+                                        <ClipboardList className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            value={data.tracking_number}
+                                            onChange={(e) => setData('tracking_number', e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]"
+                                            placeholder="e.g. FG-882910"
+                                        />
+                                    </div>
+                                    {errors.tracking_number && <p className="text-xs text-red-500 mt-1">{errors.tracking_number}</p>}
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Estimated Arrival</label>
+                                        <div className="relative">
+                                            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                            <input
+                                                type="datetime-local"
+                                                value={data.estimated_arrival}
+                                                onChange={(e) => setData('estimated_arrival', e.target.value)}
+                                                required
+                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]"
+                                            />
+                                        </div>
+                                        {errors.estimated_arrival && <p className="text-xs text-red-500 mt-1">{errors.estimated_arrival}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-1">Current Location</label>
+                                        <div className="relative">
+                                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                            <input
+                                                type="text"
+                                                value={data.current_location}
+                                                onChange={(e) => setData('current_location', e.target.value)}
+                                                required
+                                                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]"
+                                                placeholder="e.g. Nairobi Depot"
+                                            />
+                                        </div>
+                                        {errors.current_location && <p className="text-xs text-red-500 mt-1">{errors.current_location}</p>}
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Current Location</label>
-                                    <div className="relative">
-                                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                                        <input type="text" className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-[#0d9488] focus:border-[#0d9488]" placeholder="e.g. Nairobi Depot" />
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
-                        <button onClick={() => setIsDispatchModalOpen(false)} className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-900">Cancel</button>
-                        <button onClick={() => {
-                            console.log("Shipment Created");
-                            setIsDispatchModalOpen(false);
-                        }} className="px-6 py-2 bg-[#0d9488] text-white rounded-lg text-sm font-bold hover:bg-[#0f766e] shadow-lg shadow-teal-500/20 transition-all">
-                            Confirm Dispatch
-                        </button>
-                    </div>
+                        <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setIsDispatchModalOpen(false)}
+                                className="px-4 py-2 text-sm font-bold text-slate-600 hover:text-slate-900"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="px-6 py-2 bg-[#0d9488] text-white rounded-lg text-sm font-bold hover:bg-[#0f766e] shadow-lg shadow-teal-500/20 transition-all disabled:opacity-50"
+                            >
+                                {processing ? 'Creating...' : 'Confirm Dispatch'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

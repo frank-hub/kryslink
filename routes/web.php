@@ -7,7 +7,9 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Supplier\ProductController;
 use App\Http\Controllers\Supplier\AuthController;
+use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\ShipmentController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
@@ -15,6 +17,7 @@ Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.sho
 Route::get('login',[UserController::class,'Customerlogin'])->name('login');
 Route::post('authlogin',[UserController::class,'login'])->name('user.login');
 Route::post('register',[UserController::class,'register'])->name('user.register');
+Route::get('logout',[UserController::class,'logout'])->name('user.logout');
 
 Route::get('/supplier/auth', function () {
     return Inertia::render('Supplier/Auth/Auth');
@@ -30,6 +33,12 @@ Route::get('/marketplace', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('/checkout',[OrderController::class,'create'])->name('checkout');
     Route::post('/orders/store',[OrderController::class,'store'])->name('orders.store');
+    Route::get('payment.confirmation', function () {
+
+        return Inertia::render('PaymentConfirmation', [
+            'orders' => session('orders', []),
+        ]);
+    })->name('payment.confirmation');
 });
 
 Route::get('/cart', function () {
@@ -61,6 +70,7 @@ Route::group(['prefix' => 'dashboard'], function () {
 Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::group(['prefix' => 'supplier'], function () {
+
         Route::get('/dashboard', function () {
             return Inertia::render('Supplier/Dashboard');
         })->name('supplier.dashboard');
@@ -71,13 +81,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::get('/products/create', [ProductController::class, 'create'])->name('supplier.products.create');
 
-        Route::get('/orders', function () {
-            return Inertia::render('Supplier/Orders');
-        })->name('supplier.orders');
-
-        Route::get('/shipments', function () {
-            return Inertia::render('Supplier/Shipments');
-        })->name('supplier.shipments');
+        Route::get('/orders',[SupplierController::class,'orders'])->name('supplier.orders');
 
         Route::get('/finance', function () {
             return Inertia::render('Supplier/Finance');
@@ -96,8 +100,16 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         })->name('supplier.analytics');
     });
 
+});
 
+    Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('supplier.shipments.store');
 
+Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
+
+    // Add these shipment routes
+    Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
+    // Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('shipments.store');
+    Route::patch('/shipments/{shipment}/status', [ShipmentController::class, 'updateStatus'])->name('shipments.updateStatus');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

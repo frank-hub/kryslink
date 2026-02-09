@@ -1,11 +1,18 @@
 
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link ,usePage} from '@inertiajs/react';
 import { CheckCircle, Download, ArrowRight, Home } from 'lucide-react';
 import { Layout } from './Layout';
 
 export default function PaymentConfirmation() {
-  const orderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
+
+    interface PageProps {
+        orders: string[];
+    }
+
+    const { orders } = usePage<PageProps>().props;
+
+//   const orderId = `ORD-${Math.floor(Math.random() * 1000000)}`;
 
   return (
     <Layout>
@@ -21,7 +28,7 @@ export default function PaymentConfirmation() {
 
             <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-100">
                 <p className="text-sm text-slate-500 mb-1">Order Reference</p>
-                <p className="text-2xl font-mono font-bold text-slate-800 tracking-wider">{orderId}</p>
+                <p className="text-2xl font-mono font-bold text-slate-800 tracking-wider">{orders?.[0] || 'No orders available'}</p>
                 <div className="my-4 border-t border-slate-200"></div>
                 <p className="text-sm text-slate-600">
                     A confirmation email and ETIMS receipt have been sent to your registered email address.
