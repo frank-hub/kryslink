@@ -102,13 +102,12 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 });
 
-    Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('supplier.shipments.store');
 
 Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
 
     // Add these shipment routes
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
-    // Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('shipments.store');
+    Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('shipments.store');
     Route::patch('/shipments/{shipment}/status', [ShipmentController::class, 'updateStatus'])->name('shipments.updateStatus');
 });
 

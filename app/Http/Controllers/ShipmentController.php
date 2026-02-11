@@ -48,20 +48,16 @@ class ShipmentController extends Controller
             'current_location' => 'required|string|max:255',
         ]);
 
-        // Get the order
         $order = Order::with('user')->findOrFail($validated['order_id']);
 
-        // Verify the authenticated user is the supplier
         if ($order->supplier_id !== Auth::id()) {
             return back()->withErrors(['error' => 'Unauthorized action']);
         }
 
-        // Check if shipment already exists for this order
         if ($order->shipment) {
             return back()->withErrors(['error' => 'Shipment already exists for this order']);
         }
 
-        // Create shipment
         $shipment = Shipment::create([
             'shipment_reference' => Shipment::generateReference(),
             'order_id' => $order->id,
@@ -74,13 +70,11 @@ class ShipmentController extends Controller
             'status' => 'dispatched',
         ]);
 
-        // Update order status to 'shipped' or 'processing'
         $order->update(['status' => 'shipped']);
 
-        return redirect()->route('supplier.shipments.index')
-            ->with('success', 'Shipment created successfully');
+        // This will work with Inertia and close your modal
+        return back()->with('success', 'Shipment created successfully');
     }
-
     // Update shipment status
     public function updateStatus(Request $request, Shipment $shipment)
     {

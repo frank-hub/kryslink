@@ -48,6 +48,8 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  const { flash } = usePage().props as any;
+
   // ADD THIS - Form for updating order status
   const statusForm = useForm({
     status: '',
@@ -94,13 +96,15 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   // ADD THIS - Handle shipment submission
   const handleSubmitShipment = (e: React.FormEvent) => {
     e.preventDefault();
-    router.post('supplier.shipments.store'), {
+    router.post('/supplier/shipments/store', {
+        ...data,
+    }, {
       onSuccess: () => {
         setIsDispatchModalOpen(false);
         reset();
         setSelectedOrder(null);
       },
-    };
+    });
   };
 
   // ADD THIS - Handle status update
@@ -120,6 +124,21 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   return (
     <SupplierLayout>
       <Head title="Orders Management" />
+
+      {/* Add success message display */}
+      {flash?.success && (
+        <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
+          {flash.success}
+        </div>
+      )}
+
+      {/* Add error message display */}
+      {flash?.error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+          {flash.error}
+        </div>
+      )}
+
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
