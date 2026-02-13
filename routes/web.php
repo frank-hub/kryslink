@@ -10,6 +10,7 @@ use App\Http\Controllers\Supplier\AuthController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\Supplier\AnalyticsController;
 use App\Http\Controllers\Supplier\DashboardController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
@@ -94,9 +95,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
             return Inertia::render('Supplier/Settings');
         })->name('supplier.settings');
 
-        Route::get('/analytics', function () {
-            return Inertia::render('Supplier/Analytics');
-        })->name('supplier.analytics');
+        Route::get('/analytics',[AnalyticsController::class,'index'])->name('supplier.analytics');
     });
 
 });

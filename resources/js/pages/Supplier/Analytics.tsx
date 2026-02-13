@@ -9,6 +9,55 @@ import {
   ChevronRight, Map, Zap
 } from 'lucide-react';
 
+
+interface Metric {
+  value: number;
+  formatted: string;
+  change: number;
+  trend: 'up' | 'down';
+}
+
+interface AnalyticsMetrics {
+  grossSales: Metric;
+  orderVolume: Metric;
+  avgOrderValue: Metric;
+  newCustomers: Metric;
+}
+
+interface RevenuePerformanceData {
+  date: string;
+  revenue: number;
+}
+
+interface RegionalSale {
+  region: string;
+  sales: number;
+  orders: number;
+  percentage: number;
+}
+
+interface TopProduct {
+  name: string;
+  quantity: number;
+  revenue: number;
+}
+
+interface CategorySale {
+  category: string;
+  revenue: number;
+  orders: number;
+}
+
+interface AnalyticsProps {
+  metrics: AnalyticsMetrics;
+  revenuePerformance: RevenuePerformanceData[];
+  regionalSales: RegionalSale[];
+  topRegion: RegionalSale | null;
+  topProducts: TopProduct[];
+  salesByCategory?: CategorySale[];
+}
+
+
 const StatCard = ({ title, value, change, isPositive, icon: Icon }: any) => (
   <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
     <div className="flex justify-between items-start mb-4">
@@ -17,7 +66,7 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon }: any) => (
       </div>
       <div className={`flex items-center text-xs font-bold px-2 py-1 rounded-full ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
         {isPositive ? <TrendingUp className="h-3 w-3 mr-1" /> : <ArrowDownRight className="h-3 w-3 mr-1" />}
-        {change}
+        {Math.abs(change)}%
       </div>
     </div>
     <p className="text-sm font-medium text-slate-500 mb-1">{title}</p>
@@ -25,22 +74,21 @@ const StatCard = ({ title, value, change, isPositive, icon: Icon }: any) => (
   </div>
 );
 
-export default function SupplierAnalytics() {
+export default function SupplierAnalytics
+({
+  metrics,
+  revenuePerformance,
+  regionalSales,
+  topRegion,
+  topProducts,
+  salesByCategory
+}: AnalyticsProps) {
+
   const [timeRange, setTimeRange] = useState('Last 30 Days');
-
-  const topProducts = [
-    { name: 'Amoxicillin 500mg', sales: 1240, growth: '+12%', stock: 450 },
-    { name: 'Panadol Extra', sales: 980, growth: '+5%', stock: 1200 },
-    { name: 'Insulin Glargine', sales: 520, growth: '+24%', stock: 85 },
-    { name: 'Surgical Masks', sales: 440, growth: '-2%', stock: 5000 },
-  ];
-
-  const regionalData = [
-    { county: 'Nairobi', percentage: 45, color: 'bg-[#0d9488]' },
-    { county: 'Mombasa', percentage: 22, color: 'bg-teal-400' },
-    { county: 'Kisumu', percentage: 15, color: 'bg-teal-200' },
-    { county: 'Others', percentage: 18, color: 'bg-slate-200' },
-  ];
+  const regionalDataWithColors = regionalSales.slice(0, 4).map((region, index) => ({
+    ...region,
+    color: ['bg-[#0d9488]', 'bg-teal-400', 'bg-teal-200', 'bg-slate-200'][index] || 'bg-slate-200'
+  }));
 
   return (
     <SupplierLayout>
@@ -127,10 +175,10 @@ export default function SupplierAnalytics() {
             Regional Sales
           </h3>
           <div className="space-y-6">
-            {regionalData.map((data) => (
-              <div key={data.county}>
+            {regionalDataWithColors.map((data) => (
+              <div key={data.region}>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm font-bold text-slate-700">{data.county}</span>
+                  <span className="text-sm font-bold text-slate-700">{data.region}</span>
                   <span className="text-xs font-black text-slate-400">{data.percentage}%</span>
                 </div>
                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -169,12 +217,12 @@ export default function SupplierAnalytics() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-900">{product.name}</p>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">{product.stock} units remaining</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-wider">{product.quantity} units remaining</p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-black text-slate-900">{product.sales.toLocaleString()}</p>
-                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">{product.growth} Sales</p>
+                  <p className="text-sm font-black text-slate-900">{product.revenue.toLocaleString()}</p>
+                  <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">{product.quantity} Sales</p>
                 </div>
               </div>
             ))}
