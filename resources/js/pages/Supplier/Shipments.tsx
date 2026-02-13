@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head } from '@inertiajs/react';
+import { Head ,usePage} from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
 import {
   Truck, MapPin, Calendar, ExternalLink,
@@ -7,13 +7,10 @@ import {
 } from 'lucide-react';
 
 export default function SupplierShipments() {
-  const shipments = [
-    { id: 'SHP-9001', orderId: 'ORD-7781', customer: 'Westlands Health Centre', carrier: 'Fargo Courier', tracking: 'FGO-8829302', status: 'In Transit', eta: 'Today, 2:00 PM', location: 'Dispatch Center, Nairobi', progress: 65 },
-    { id: 'SHP-9002', orderId: 'ORD-7780', customer: 'MediLife Hospital', carrier: 'Wells Fargo', tracking: 'WF-110022', status: 'Delivered', eta: 'Yesterday', location: 'Received by Dr. James', progress: 100 },
-    { id: 'SHP-9003', orderId: 'ORD-7782', customer: 'City Square Pharmacy', carrier: 'In-House Logistics', tracking: 'IH-552', status: 'Pending Pickup', eta: 'Tomorrow', location: 'Warehouse A', progress: 10 },
-    { id: 'SHP-9004', orderId: 'ORD-7775', customer: 'Afya Centre Pharmacy', carrier: 'G4S Logistics', tracking: 'G4S-99201', status: 'Exception', eta: 'Delayed', location: 'Traffic Delay - Mombasa Rd', progress: 40 },
-  ];
 
+    const {shipments: serverShipments} = usePage().props as { shipments: any[] };
+  const shipments = serverShipments || [];
+  
   const getStatusColor = (status: string) => {
     switch(status) {
         case 'In Transit': return 'text-blue-600 bg-blue-50 border-blue-100';

@@ -22,14 +22,23 @@ class ShipmentController extends Controller
             ->map(function ($shipment) {
                 return [
                     'id' => $shipment->shipment_reference,
-                    'order_ref' => $shipment->order->order_reference,
+                    'orderId' => $shipment->order->order_reference,
                     'customer' => $shipment->customer->name ?? 'N/A',
                     'carrier' => $shipment->carrier,
-                    'tracking_number' => $shipment->tracking_number,
+                    'tracking' => $shipment->tracking_number,
                     'status' => $shipment->status,
-                    'current_location' => $shipment->current_location,
-                    'estimated_arrival' => $shipment->estimated_arrival?->format('M d, Y g:i A'),
+                    'location' => $shipment->current_location,
+                    'eta' => $shipment->estimated_arrival?->format('M d, Y g:i A'),
                     'created_at' => $shipment->created_at->format('M d, Y'),
+                    'progress' => match ($shipment->status) {
+                        'pending' => 0,
+                        'dispatched' => 25,
+                        'in_transit' => 50,
+                        'out_for_delivery' => 75,
+                        'delivered' => 100,
+                        'exception' => 50,
+                        default => 0,
+                    },
                 ];
             });
 
