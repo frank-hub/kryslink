@@ -9,7 +9,7 @@ import {
 
 interface Order {
   id: string;
-  order_id: number; // ADD THIS - the actual database ID
+  order_id: number; 
   customer: string;
   date: string;
   amount: number;
@@ -23,7 +23,7 @@ interface OrdersPageProps {
 }
 
 export interface ShipmentFormData {
-  order_id: number;
+  order_id: string;
   carrier: 'Fargo Courier' | 'Wells Fargo' | 'In-House Delivery' | 'G4S Logistics';
   tracking_number: string;
   estimated_arrival: string;
@@ -57,7 +57,7 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
 
   // ADD THIS - Form for creating shipment
   const { data, setData, post, processing, errors, reset } = useForm<ShipmentFormData>({
-    order_id: 0,
+    order_id: '',
     carrier: 'Fargo Courier',
     tracking_number: '',
     estimated_arrival: '',
@@ -75,11 +75,10 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
     }
   };
 
-  // MODIFY THIS
   const handleOpenDispatch = (order: Order) => {
     setSelectedOrder(order);
     setData({
-      order_id: order.order_id, // Use the actual database ID
+      order_id:  order.id,
       carrier: 'Fargo Courier',
       tracking_number: '',
       estimated_arrival: '',

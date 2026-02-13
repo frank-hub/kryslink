@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Order;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -40,17 +41,21 @@ class ShipmentController extends Controller
     // Create/Dispatch shipment
     public function store(Request $request)
     {
+        Log::info('Store method hit', ['request' => $request->all()]);
+
         $validated = $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'carrier' => 'required|in:Fargo Courier,Wells Fargo,In-House Delivery,G4S Logistics',
+            'order_id' => 'required|exists:orders,order_reference',
+            'carrier' => 'required',
             'tracking_number' => 'nullable|string|max:255',
             'estimated_arrival' => 'required|date',
             'current_location' => 'required|string|max:255',
         ]);
 
-        $order = Order::with('user')->findOrFail($validated['order_id']);
+        $order = Order::with('user')
+            ->where('order_reference', $validated['order_id'])
+            ->firstOrFail();
 
-        if ($order->supplier_id !== Auth::id()) {
+        if ((int) $order->supplier_id !== (int) Auth::id()) {
             return back()->withErrors(['error' => 'Unauthorized action']);
         }
 
@@ -64,7 +69,7 @@ class ShipmentController extends Controller
             'supplier_id' => Auth::id(),
             'customer_id' => $order->user_id,
             'carrier' => $validated['carrier'],
-            'tracking_number' => $validated['tracking_number'],
+            'tracking_number' => $validated['tracking_number'] ?? null,
             'current_location' => $validated['current_location'],
             'estimated_arrival' => $validated['estimated_arrival'],
             'status' => 'dispatched',
@@ -72,7 +77,6 @@ class ShipmentController extends Controller
 
         $order->update(['status' => 'shipped']);
 
-        // This will work with Inertia and close your modal
         return back()->with('success', 'Shipment created successfully');
     }
     // Update shipment status
