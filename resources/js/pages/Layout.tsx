@@ -11,9 +11,22 @@ import { CartItem, ChatMessage, Product } from '../../../types';
 import { KENYA_COUNTIES } from '../constants';
 
 // --- Shared Components for Layout ---
+interface PageProps {
+  auth: {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+    } | null;
+  };
+}
 
 const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const { auth } = usePage<PageProps>().props;
+
+  isLoggedIn = !!auth.user;
 
   return (
     <nav className="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
@@ -23,14 +36,13 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
             <div className="bg-[#0d9488] p-2 rounded-lg mr-2">
               <ShieldCheck className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-slate-800 tracking-tight">MediConnect<span className="text-[#0d9488]">KE</span></span>
+            <span className="text-xl font-bold text-slate-800 tracking-tight">Krys<span className="text-[#0d9488]">Link</span></span>
           </Link>
 
           <div className="hidden md:flex space-x-8 items-center">
             <Link href="/" className="text-slate-600 hover:text-[#0d9488] font-medium transition-colors">Home</Link>
             <Link href="/marketplace" className="text-slate-600 hover:text-[#0d9488] font-medium transition-colors">Marketplace</Link>
-            <button className="text-slate-600 hover:text-[#0d9488] font-medium transition-colors">Suppliers</button>
-            <button className="text-slate-600 hover:text-[#0d9488] font-medium transition-colors">Track Order</button>
+            <Link href="/track-order" className="text-slate-600 hover:text-[#0d9488] font-medium transition-colors">Track Order</Link>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -102,7 +114,7 @@ const Footer = () => (
                <div className="bg-[#0d9488] p-2 rounded-lg mr-2">
                   <ShieldCheck className="h-6 w-6 text-white" />
                </div>
-               <span className="text-xl font-bold text-slate-900 tracking-tight">MediConnect<span className="text-[#0d9488]">KE</span></span>
+               <span className="text-xl font-bold text-slate-900 tracking-tight">Krys<span className="text-[#0d9488]">Link</span></span>
             </div>
             <p className="text-sm text-slate-500">
               Connecting Kenya's healthcare providers with trusted pharmaceutical suppliers. Seamless, compliant, and efficient.
@@ -130,13 +142,13 @@ const Footer = () => (
             <h3 className="text-slate-900 font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3 text-sm text-slate-500">
               <li className="flex items-center"><Phone className="h-4 w-4 mr-2 text-[#0d9488]" /> +254 700 123 456</li>
-              <li className="flex items-center"><Mail className="h-4 w-4 mr-2 text-[#0d9488]" /> support@mediconnect.co.ke</li>
+              <li className="flex items-center"><Mail className="h-4 w-4 mr-2 text-[#0d9488]" /> support@Krys.co.ke</li>
               <li className="flex items-center"><MapPin className="h-4 w-4 mr-2 text-[#0d9488]" /> Westlands, Nairobi, Kenya</li>
             </ul>
           </div>
         </div>
         <div className="border-t border-slate-200 mt-12 pt-8 text-sm text-center text-slate-400">
-          &copy; {new Date().getFullYear()} MediConnect Kenya. All rights reserved.
+          &copy; {new Date().getFullYear()} Krys Kenya. All rights reserved.
         </div>
       </div>
     </footer>
@@ -240,7 +252,7 @@ const AuthModal = ({ isOpen, onClose, onLogin }: any) => {
               </div>
               <div className="flex flex-col md:flex-row h-full">
                   <div className="hidden md:flex md:w-5/12 bg-[#0d9488] p-8 flex-col justify-between text-white">
-                      <div><Building2 className="h-10 w-10 mb-4 text-primary-200" /><h3 className="text-2xl font-bold mb-2">Join MediConnect</h3><p className="text-primary-100 text-sm">Access Kenya's largest network of verified pharmaceutical suppliers.</p></div>
+                      <div><Building2 className="h-10 w-10 mb-4 text-primary-200" /><h3 className="text-2xl font-bold mb-2">Join Krys</h3><p className="text-primary-100 text-sm">Access Kenya's largest network of verified pharmaceutical suppliers.</p></div>
                       <div className="space-y-4 text-xs text-primary-200">
                           <div className="flex items-center"><div className="w-1.5 h-1.5 bg-white rounded-full mr-2"></div>Bulk Pricing</div>
                           <div className="flex items-center"><div className="w-1.5 h-1.5 bg-white rounded-full mr-2"></div>Next Day Delivery</div>
@@ -331,7 +343,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Sync cart to local storage
   useEffect(() => {
@@ -361,7 +372,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <Navbar
         cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)}
         onOpenCart={() => setIsCartOpen(true)}
-        isLoggedIn={isLoggedIn}
         onAuthOpen={() => setIsAuthOpen(true)}
       />
 
@@ -381,7 +391,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <AuthModal
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
-        onLogin={() => { setIsLoggedIn(true); setIsAuthOpen(false); }}
+        onLogin={() => { setIsAuthOpen(false); }}
       />
     </div>
   );

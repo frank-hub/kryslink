@@ -8,6 +8,50 @@ import {
   AlertCircle, CheckCircle2, Clock, Eye
 } from 'lucide-react';
 
+
+interface DashboardMetrics {
+  totalRevenue: {
+    value: number;
+    formatted: string;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  pendingOrders: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  activeProducts: {
+    value: number;
+    change: number;
+    trend: 'up' | 'down';
+  };
+  ordersShipped: {
+    value: number;
+    formatted: string;
+    change: number;
+    trend: 'up' | 'down';
+  };
+}
+
+interface RevenueData {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+interface LowStockProduct {
+  name: string;
+  stock: number;
+}
+
+interface DashboardProps {
+  metrics: DashboardMetrics;
+  revenueAnalytics: RevenueData[];
+  lowStockAlerts: LowStockProduct[];
+  recentOrders: any[];
+}
+
 const StatCard = ({ title, value, change, trend, icon: Icon, colorClass }: any) => (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-all duration-300">
         <div className="relative z-10">
@@ -33,7 +77,14 @@ const StatCard = ({ title, value, change, trend, icon: Icon, colorClass }: any) 
     </div>
 );
 
-export default function SupplierDashboard() {
+export default function SupplierDashboard
+({ 
+  metrics, 
+  revenueAnalytics, 
+  lowStockAlerts,
+  recentOrders 
+}: DashboardProps){
+
   const orders = [
     { id: 'ORD-7782', pharmacy: 'City Square Pharmacy', amount: 45000, date: '10 mins ago', status: 'Pending', items: 12 },
     { id: 'ORD-7781', pharmacy: 'Westlands Health Centre', amount: 128000, date: '1 hour ago', status: 'Processing', items: 45 },
@@ -76,33 +127,33 @@ export default function SupplierDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <StatCard
                 title="Total Revenue"
-                value="KES 4.2M"
-                change="+12.5%"
-                trend="up"
+                value={metrics.totalRevenue.formatted}
+                change={`${metrics.totalRevenue.change}%`}
+                trend={metrics.totalRevenue.trend}
                 icon={DollarSign}
                 colorClass="bg-emerald-500"
             />
             <StatCard
                 title="Pending Orders"
-                value="18"
-                change="+4"
-                trend="up"
+                value={metrics.pendingOrders.value}
+                change={`${metrics.pendingOrders.change > 0 ? '+' : ''}${metrics.pendingOrders.change}`}
+                trend={metrics.pendingOrders.trend}
                 icon={ShoppingCart}
                 colorClass="bg-amber-500"
             />
             <StatCard
                 title="Active Products"
-                value="142"
-                change="-2"
-                trend="down"
+                value={metrics.activeProducts.value}
+                change={`${metrics.activeProducts.change > 0 ? '+' : ''}${metrics.activeProducts.change}`}
+                trend={metrics.activeProducts.trend}
                 icon={Package}
                 colorClass="bg-blue-500"
             />
              <StatCard
-                title="Product Views"
-                value="8.5K"
-                change="+24%"
-                trend="up"
+                title="Shipped Orders"
+                value={metrics.ordersShipped.formatted}
+                change={`${metrics.ordersShipped.change}%`}
+                trend={metrics.ordersShipped.trend}
                 icon={Eye}
                 colorClass="bg-purple-500"
             />
@@ -113,35 +164,99 @@ export default function SupplierDashboard() {
             {/* Main Content Column */}
             <div className="lg:col-span-2 space-y-8">
 
-                {/* Sales Chart Area Placeholder */}
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="font-bold text-slate-900">Revenue Analytics</h3>
-                        <select className="bg-slate-50 border border-slate-200 text-slate-600 text-sm rounded-lg p-2 focus:ring-teal-500 focus:border-teal-500">
-                            <option>Last 7 Days</option>
-                            <option>Last 30 Days</option>
-                            <option>This Year</option>
-                        </select>
+                {/* Revenue Analytics Chart - FIXED */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-bold text-slate-900">Revenue Analytics</h3>
+                            <select className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600">
+                                <option>Last 7 Days</option>
+                            </select>
+                        </div>
+                        
+                        <div className="relative">
+                            {/* Y-axis labels */}
+                            {revenueAnalytics && revenueAnalytics.length > 0 && (
+                                <div className="absolute left-0 top-0 h-64 flex flex-col justify-between text-[10px] text-slate-400 pr-2 w-12">
+                                    {(() => {
+                                        const maxRevenue = Math.max(...revenueAnalytics.map(d => d.revenue));
+                                        return [1, 0.75, 0.5, 0.25, 0].map((percent, i) => {
+                                            const value = maxRevenue * percent;
+                                            return (
+                                                <div key={i} className="text-right">
+                                                    {value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value.toFixed(0)}
+                                                </div>
+                                            );
+                                        });
+                                    })()}
+                                </div>
+                            )}
+
+                            {/* Chart Container */}
+                            <div className="h-64 w-full flex items-end justify-between gap-2 pl-14 pr-2">
+                                {revenueAnalytics && revenueAnalytics.length > 0 ? (
+                                    (() => {
+                                        const maxRevenue = Math.max(...revenueAnalytics.map(d => d.revenue));
+                                        return revenueAnalytics.map((day, i) => {
+                                            const barHeight = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
+                                            
+                                            return (
+                                                <div 
+                                                    key={i} 
+                                                    className="flex-1 relative group cursor-pointer"
+                                                    style={{ minWidth: '40px' }}
+                                                >
+                                                    {/* Bar background */}
+                                                    <div className="absolute bottom-0 w-full h-full bg-teal-50 rounded-t-lg"></div>
+                                                    
+                                                    {/* Bar fill */}
+                                                    <div
+                                                        className="absolute bottom-0 w-full bg-gradient-to-t from-[#0d9488] to-[#14b8a6] rounded-t-lg transition-all duration-500 shadow-lg group-hover:shadow-xl"
+                                                        style={{ 
+                                                            height: `${Math.max(barHeight, 3)}%`,
+                                                            minHeight: '8px'
+                                                        }}
+                                                    ></div>
+                                                    
+                                                    {/* Tooltip */}
+                                                    <div className="opacity-0 group-hover:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg pointer-events-none transition-all duration-200 whitespace-nowrap z-20 shadow-xl">
+                                                        <div className="font-bold text-sm">KES {day.revenue.toLocaleString()}</div>
+                                                        <div className="text-[10px] text-emerald-300 mt-1">{day.orders} {day.orders === 1 ? 'order' : 'orders'}</div>
+                                                        <div className="text-[10px] text-slate-400 mt-0.5">{day.date}</div>
+                                                        {/* Tooltip arrow */}
+                                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45"></div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        });
+                                    })()
+                                ) : (
+                                    <div className="flex items-center justify-center w-full h-full">
+                                        <div className="text-center text-slate-400">
+                                            <svg className="w-16 h-16 mx-auto mb-3 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                            </svg>
+                                            <p className="text-sm font-semibold text-slate-600">No Revenue Data</p>
+                                            <p className="text-xs mt-1.5 text-slate-500">Revenue from paid orders will appear here</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            
+                            {/* X-axis labels */}
+                            {revenueAnalytics && revenueAnalytics.length > 0 && (
+                                <div className="flex justify-between pl-14 pr-2 mt-3 border-t border-slate-100 pt-2">
+                                    {revenueAnalytics.map((day, i) => (
+                                        <div 
+                                            key={i} 
+                                            className="text-[11px] text-slate-600 font-medium text-center flex-1"
+                                        >
+                                            {day.date}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
-                    {/* Visual Placeholder for Chart */}
-                    <div className="h-64 w-full flex items-end justify-between space-x-2 px-2">
-                         {[35, 45, 30, 60, 75, 50, 65, 80, 70, 45, 60, 90].map((h, i) => (
-                             <div key={i} className="w-full bg-teal-50 rounded-t-lg relative group">
-                                 <div
-                                    className="absolute bottom-0 w-full bg-[#0d9488] rounded-t-lg transition-all duration-500 opacity-80 group-hover:opacity-100"
-                                    style={{ height: `${h}%` }}
-                                 ></div>
-                                 <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs py-1 px-2 rounded pointer-events-none transition-opacity">
-                                     KES {h}k
-                                 </div>
-                             </div>
-                         ))}
-                    </div>
-                    <div className="flex justify-between text-xs text-slate-400 mt-4 px-2">
-                        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
-                        <span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-                    </div>
-                </div>
 
                 {/* Recent Orders Table */}
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">

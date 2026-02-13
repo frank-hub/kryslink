@@ -12,6 +12,7 @@ import {
 import { generateAIResponse } from '../services/geminiService';
 import { KENYA_COUNTIES, MOCK_PRODUCTS } from '../constants';
 import { CartItem, ChatMessage, Product , NewUser, Page } from '../../../types';
+import { Layout } from './Layout';
 
 
 const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
@@ -502,13 +503,8 @@ export default function Welcome() {
 
 
   return (
-    <div className="min-h-screen flex flex-col font-sans text-slate-900 bg-slate-50">
-      <Head title="Welcome" />
-
-      {/* Navbar */}
-      <Navbar cartCount={cart.reduce((acc, item) => acc + item.quantity, 0)} onOpenCart={() => setIsCartOpen(true)} isLoggedIn={isLoggedIn} onAuthOpen={() => setIsAuthOpen(true)} />
-
-      {/* Main Content */}
+    <Layout>
+        {/* Main Content */}
       <div className="flex-grow bg-slate-50">
         {/* Hero Section */}
         <div className="relative bg-white overflow-hidden pb-16">
@@ -650,11 +646,11 @@ export default function Welcome() {
 
       </div>
 
-      {/* Modals & Chat */}
-      <Footer />
+
       <AIChatBot />
       <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} items={cart} onRemove={handleRemoveFromCart} onUpdateQty={handleUpdateQty} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onLogin={() => { setIsLoggedIn(true); setIsAuthOpen(false); }} />
-    </div>
+    
+    </Layout>
   );
 }

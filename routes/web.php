@@ -10,6 +10,7 @@ use App\Http\Controllers\Supplier\AuthController;
 use App\Http\Controllers\Supplier\SupplierController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ShipmentController;
+use App\Http\Controllers\Supplier\DashboardController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
@@ -71,9 +72,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
     Route::group(['prefix' => 'supplier'], function () {
 
-        Route::get('/dashboard', function () {
-            return Inertia::render('Supplier/Dashboard');
-        })->name('supplier.dashboard');
+        Route::get('/dashboard',[DashboardController::class,'index'])->name('supplier.dashboard');
 
         Route::get('/products', [ProductController::class, 'index'])->name('supplier.products.index');
 
