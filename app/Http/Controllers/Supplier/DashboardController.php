@@ -41,7 +41,7 @@ class DashboardController extends Controller
         
         // 2. Pending Orders (current vs last week)
         $currentPendingOrders = Order::where('supplier_id', $supplierId)
-            ->where('status', 'pending')
+            ->where('status', 'Processing')
             ->count();
             
         $lastWeekPendingOrders = Order::where('supplier_id', $supplierId)

@@ -275,21 +275,19 @@ export default function SupplierDashboard
                                 <tr>
                                     <th className="px-6 py-4 font-semibold">Order ID</th>
                                     <th className="px-6 py-4 font-semibold">Customer</th>
-                                    <th className="px-6 py-4 font-semibold">Items</th>
                                     <th className="px-6 py-4 font-semibold">Amount</th>
                                     <th className="px-6 py-4 font-semibold">Status</th>
                                     <th className="px-6 py-4 font-semibold text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {orders.map((order) => (
+                                {recentOrders.map((order) => (
                                     <tr key={order.id} className="hover:bg-slate-50 transition-colors">
                                         <td className="px-6 py-4 font-medium text-slate-900">
                                             {order.id}
                                             <div className="text-[10px] text-slate-400 font-normal">{order.date}</div>
                                         </td>
-                                        <td className="px-6 py-4 text-slate-600 font-medium">{order.pharmacy}</td>
-                                        <td className="px-6 py-4 text-slate-500">{order.items} items</td>
+                                        <td className="px-6 py-4 text-slate-600 font-medium">{order.customer}</td>
                                         <td className="px-6 py-4 font-bold text-slate-900">KES {order.amount.toLocaleString()}</td>
                                         <td className="px-6 py-4">
                                             <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusStyle(order.status)}`}>
@@ -320,11 +318,7 @@ export default function SupplierDashboard
                         Low Stock Alerts
                     </h3>
                     <div className="space-y-4">
-                        {[
-                            { name: 'Amoxicillin 500mg', stock: 12, total: 500 },
-                            { name: 'Panadol Extra', stock: 45, total: 1000 },
-                            { name: 'Surgical Masks', stock: 80, total: 5000 }
-                        ].map((item, idx) => (
+                        {lowStockAlerts.map((item, idx) => (
                             <div key={idx} className="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <div className="flex justify-between items-center mb-2">
                                     <span className="font-medium text-slate-700 text-sm">{item.name}</span>
