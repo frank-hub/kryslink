@@ -89,7 +89,7 @@ const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
         // Clear cart
         localStorage.removeItem('mediconnect_cart');
         window.dispatchEvent(new CustomEvent('cart-updated')); // Notify other components
-        router.visit('/payment-confirmation');
+        router.visit('/payment.confirmation');
     }, 1500);
   };
 
