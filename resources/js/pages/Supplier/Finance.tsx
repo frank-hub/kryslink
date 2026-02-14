@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
 import {
   Wallet, TrendingUp, ArrowUpRight, Download, CreditCard,
@@ -125,8 +125,8 @@ export default function SupplierFinance({
           <p className="text-slate-500">Manage your payouts and view detailed financial reports.</p>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 font-medium transition-colors shadow-sm">
-            <Download className="h-4 w-4 mr-2" /> Statement
+          <button onClick={() => router.visit('/supplier/payout-methods')}  className="flex items-center px-4 py-2 bg-white border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50 font-medium transition-colors shadow-sm">
+            <Banknote className="h-4 w-4 mr-2" /> Payout Method
           </button>
           <button
             onClick={() => setIsPayoutModalOpen(true)}

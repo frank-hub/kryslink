@@ -124,4 +124,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
+
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Product Management Routes
+    Route::get('/products', [AdminProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}', [AdminProductController::class, 'show'])->name('products.show');
+    Route::patch('/products/{product}/status', [AdminProductController::class, 'updateStatus'])->name('products.update-status');
+    Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('/products/bulk-update', [AdminProductController::class, 'bulkUpdateStatus'])->name('products.bulk-update');
+
+});
+
+    
 require __DIR__.'/settings.php';

@@ -27,26 +27,15 @@ class PayoutMethodController extends Controller
 
         $validated = $request->validate([
             'type' => 'required|in:bank,mpesa',
-            'bank_name' => 'required_if:type,bank|string|max:255',
-            'account_name' => 'required_if:type,bank|string|max:255',
-            'account_number' => 'required_if:type,bank|string|max:255',
+            // 'bank_name' => 'required_if:type,bank|string|max:255',
+            // 'account_name' => 'required_if:type,bank|string|max:255',
+            // 'account_number' => 'required_if:type,bank|string|max:255',
             'mpesa_number' => 'required_if:type,mpesa|string|max:15',
-            'till_number' => 'nullable|string|max:10',
+            // 'till_number' => 'nullable|string|max:10',
             'is_primary' => 'boolean',
         ]);
 
-        Log::info('Validated payout method data:', $validated['type'] === 'bank' ? [
-            'type' => $validated['type'],
-            'bank_name' => $validated['bank_name'] ?? null,
-            'account_name' => $validated['account_name'] ?? null,
-            'account_number' => $validated['account_number'] ?? null,
-            'is_primary' => $validated['is_primary'] ?? false,
-        ] : [
-            'type' => $validated['type'],
-            'mpesa_number' => $validated['mpesa_number'] ?? null,
-            'till_number' => $validated['till_number'] ?? null,
-            'is_primary' => $validated['is_primary'] ?? false,
-        ]);
+
 
 
         // If setting as primary, remove primary from others

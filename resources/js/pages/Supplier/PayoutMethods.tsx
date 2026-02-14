@@ -50,8 +50,6 @@ export default function PayoutMethods({ methods }: PayoutMethodsProps) {
     },
     });
 
-    console.log('Submitting payout method:', data);
-
 
     router.post('/supplier/payout-methods', data, {
     onSuccess: () => {
