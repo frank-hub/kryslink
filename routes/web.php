@@ -12,6 +12,8 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Supplier\AnalyticsController;
 use App\Http\Controllers\Supplier\DashboardController;
+use App\Http\Controllers\Supplier\FinanceController;
+
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
@@ -83,14 +85,6 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
         Route::get('/orders',[SupplierController::class,'orders'])->name('supplier.orders');
 
-        Route::get('/finance', function () {
-            return Inertia::render('Supplier/Finance');
-        })->name('supplier.finance');
-
-        Route::get('/invoices', function () {
-            return Inertia::render('Supplier/Invoices');
-        })->name('supplier.invoices');
-
         Route::get('/settings', function () {
             return Inertia::render('Supplier/Settings');
         })->name('supplier.settings');
@@ -101,12 +95,19 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 });
 
 
+
+
 Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
 
-    // Add these shipment routes
+    //shipment routes
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
     Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('shipments.store');
     Route::patch('/shipments/{shipment}/status', [ShipmentController::class, 'updateStatus'])->name('shipments.updateStatus');
+
+    //finance routes
+    Route::get('/finance', [FinanceController::class, 'index'])->name('finance');
+    Route::post('/finance/request-payout', [FinanceController::class, 'requestPayout'])->name('finance.request-payout');
+
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
