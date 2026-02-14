@@ -13,7 +13,7 @@ use App\Http\Controllers\ShipmentController;
 use App\Http\Controllers\Supplier\AnalyticsController;
 use App\Http\Controllers\Supplier\DashboardController;
 use App\Http\Controllers\Supplier\FinanceController;
-
+use App\Http\Controllers\Supplier\PayoutMethodController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
@@ -107,6 +107,14 @@ Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(functi
     //finance routes
     Route::get('/finance', [FinanceController::class, 'index'])->name('finance');
     Route::post('/finance/request-payout', [FinanceController::class, 'requestPayout'])->name('finance.request-payout');
+
+
+    // Payout Methods
+    Route::get('/payout-methods', [PayoutMethodController::class, 'index'])->name('payout-methods.index');
+    Route::post('/payout-methods', [PayoutMethodController::class, 'store'])->name('payout-methods.store');
+    Route::patch('/payout-methods/{payoutMethod}', [PayoutMethodController::class, 'update'])->name('payout-methods.update');
+    Route::post('/payout-methods/{payoutMethod}/set-primary', [PayoutMethodController::class, 'setPrimary'])->name('payout-methods.set-primary');
+    Route::delete('/payout-methods/{payoutMethod}', [PayoutMethodController::class, 'destroy'])->name('payout-methods.destroy');
 
 });
 

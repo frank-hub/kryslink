@@ -103,7 +103,7 @@ class FinanceController extends Controller
             ->whereIn('status', ['pending', 'processing'])
             ->count();
         
-        return Inertia::render('Dashboard/SupplierFinance', [
+        return Inertia::render('Supplier/Finance', [
             'metrics' => [
                 'totalRevenue' => [
                     'value' => $totalRevenue,
