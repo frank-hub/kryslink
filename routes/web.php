@@ -141,5 +141,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 });
 
+Route::get('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/customer/logout', [CustomerController::class, 'logout'])->name('customer.logout');
+
 
 require __DIR__.'/settings.php';

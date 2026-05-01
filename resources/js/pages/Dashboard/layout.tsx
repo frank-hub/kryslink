@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { initializeTheme } from '../../hooks/use-appearance';
 import { auth } from '@/routes/supplier';
+import { route } from 'ziggy-js';
 
 // Ensure theme is initialized
 initializeTheme();
@@ -104,7 +105,7 @@ const { auth } = usePage().props as any;
 
         {/* Footer Actions */}
         <div className="p-4 border-t border-slate-100">
-             <Link href="/" className="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+             <Link href={route('customer.logout')} className="flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-500 hover:bg-red-50 hover:text-red-600 transition-colors">
                 <LogOut className="h-5 w-5" />
                 <span>Sign Out</span>
             </Link>
