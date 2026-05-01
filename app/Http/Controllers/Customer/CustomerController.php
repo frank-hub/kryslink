@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
@@ -23,27 +24,24 @@ class CustomerController extends Controller
 
     public function compliance()
     {
-        $users = User::where('organization_type', '!=', 'SUPPLIER')
-            ->select([
-                'id', 'name', 'email', 'organization_name', 'organization_type',
-                'kra_pin', 'pharmacy_license', 'ppb_license',
-                'is_verified', 'county', 'created_at'
-            ])
-            ->latest()
-            ->get()
-            ->map(function ($user) {
-                $user->compliance_score = collect([
-                    !empty($user->kra_pin),
-                    !empty($user->pharmacy_license),
-                    !empty($user->ppb_license),
-                    (bool) $user->is_verified,
-                ])->filter()->count();
-                return $user;
-            });
+        $user = Auth::user();
 
-        return Inertia::render('Dashboard/Compliance', [
-            'users' => $users,
-        ]);
+    return Inertia::render('Dashboard/Compliance', [
+        'user' => [
+            'id'                => $user->id,
+            'name'              => $user->name,
+            'email'             => $user->email,
+            'organization_name' => $user->organization_name,
+            'organization_type' => $user->organization_type,
+            'kra_pin'           => $user->kra_pin,
+            'pharmacy_license'  => $user->pharmacy_license,
+            'ppb_license'       => $user->ppb_license,
+            'is_verified'       => $user->is_verified,
+            'county'            => $user->county,
+            'created_at'        => $user->created_at,
+        ],
+    ]);
+    
     }
 
 }
