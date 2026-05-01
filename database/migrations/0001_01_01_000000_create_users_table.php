@@ -24,12 +24,13 @@ return new class extends Migration
             $table->string('organization_type')->nullable(); // PHARMACY, HOSPITAL
             $table->string('kra_pin')->nullable();
             $table->string('pharmacy_license')->nullable();
+            $table->string('ppb_license');
             $table->boolean('is_verified')->default(false);
             $table->string('phone')->nullable();
             $table->string('county')->nullable();
             $table->string('location')->nullable();
 
-            
+
             $table->rememberToken();
             $table->timestamps();
         });

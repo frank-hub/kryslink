@@ -27,6 +27,7 @@ class User extends Authenticatable
         'organization_name',
         'organization_type',
         'kra_pin',
+        'ppb_license',
         'pharmacy_license',
         'is_verified',
         'phone',
@@ -73,5 +74,6 @@ class User extends Authenticatable
     public function receivedOrders()
     {
         return $this->hasMany(Order::class, 'supplier_id');
+
     }
 }

@@ -27,6 +27,7 @@ export interface NewUser {
   isVerified: boolean;
   kra_pin: string;
   pharmacyLicense?: string;
+  ppb_license?: string;
   user_type?: 'PHARMACY' | 'HOSPITAL';
 }
 

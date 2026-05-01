@@ -141,8 +141,8 @@ const Footer = () => (
           <div>
             <h3 className="text-slate-900 font-semibold mb-4">Contact Us</h3>
             <ul className="space-y-3 text-sm text-slate-500">
-              <li className="flex items-center"><Phone className="h-4 w-4 mr-2 text-[#0d9488]" /> +254 700 123 456</li>
-              <li className="flex items-center"><Mail className="h-4 w-4 mr-2 text-[#0d9488]" /> support@Krys.co.ke</li>
+              <li className="flex items-center"><Phone className="h-4 w-4 mr-2 text-[#0d9488]" /> +254 118 945 894</li>
+              <li className="flex items-center"><Mail className="h-4 w-4 mr-2 text-[#0d9488]" /> support@kryslinkhub.com</li>
               <li className="flex items-center"><MapPin className="h-4 w-4 mr-2 text-[#0d9488]" /> Westlands, Nairobi, Kenya</li>
             </ul>
           </div>

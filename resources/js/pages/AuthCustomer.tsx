@@ -22,6 +22,7 @@ export default function AuthCustomer() {
     business_name: '',
     role: 'CUSTOMER',
     kra_pin: '',
+    ppb_license: '',
     county: '',
     user_type: 'PHARMACY',
     isVerified: false,
@@ -166,6 +167,14 @@ export default function AuthCustomer() {
                       onChange={(e) => setNewUser({ ...newUser, business_name: e.target.value })}
                       className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                       placeholder="Business Name"
+                      required
+                    />
+                    <input
+                      type="text"
+                      value={newUser.ppb_license}
+                      onChange={(e) => setNewUser({ ...newUser, ppb_license: e.target.value })}
+                      className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+                      placeholder="PPB License Number"
                       required
                     />
                     <div className="grid grid-cols-2 gap-4">

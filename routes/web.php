@@ -14,6 +14,7 @@ use App\Http\Controllers\Supplier\AnalyticsController;
 use App\Http\Controllers\Supplier\DashboardController;
 use App\Http\Controllers\Supplier\FinanceController;
 use App\Http\Controllers\Supplier\PayoutMethodController;
+use App\Http\Controllers\Customer\CustomerController;
 
 Route::get('/', [WelcomeController::class,'index'])->name('home');
 Route::get('product/{id}', [WelcomeController::class,'show'])->name('product.show');
@@ -30,11 +31,10 @@ Route::get('/supplier/auth', function () {
 Route::post('/supplier/login', [AuthController::class, 'login']);
 Route::post('/supplier/register', [AuthController::class, 'register']);
 
-Route::get('/marketplace', function () {
+Route::middleware(['auth'])->group(function () {
+    Route::get('/marketplace', function () {
     return Inertia::render('Marketplace');
 })->name('marketplace');
-
-Route::middleware(['auth'])->group(function () {
     Route::get('/checkout',[OrderController::class,'create'])->name('checkout');
     Route::post('/orders/store',[OrderController::class,'store'])->name('orders.store');
     Route::get('payment.confirmation', function () {
@@ -62,14 +62,11 @@ Route::group(['prefix' => 'dashboard'], function () {
             return Inertia::render('Dashboard/index');
         })->name('dashboard.index');
 
-        Route::get('/orders', function () {
-            return Inertia::render('Dashboard/orders');
-        })->name('dashboard.orders');
+        Route::get('/orders', [OrderController::class, 'index'])->name('customer.orders');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
-
-        Route::get('/suppliers', function () {
-            return Inertia::render('Dashboard/suppliers');
-        })->name('dashboard.suppliers');
+        Route::get('/compliance', [CustomerController::class, 'compliance'])->name('compliance');
+        Route::get('/suppliers', [CustomerController::class, 'suppliers'])->name('dashboard.suppliers');
     });
 Route::group(['middleware' => ['auth', 'verified']], function () {
 
@@ -139,5 +136,5 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 });
 
-    
+
 require __DIR__.'/settings.php';

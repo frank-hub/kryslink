@@ -52,6 +52,7 @@ interface DashboardProps {
   recentOrders: any[];
 }
 
+
 const StatCard = ({ title, value, change, trend, icon: Icon, colorClass }: any) => (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-md transition-all duration-300">
         <div className="relative z-10">
@@ -78,11 +79,11 @@ const StatCard = ({ title, value, change, trend, icon: Icon, colorClass }: any) 
 );
 
 export default function SupplierDashboard
-({ 
-  metrics, 
-  revenueAnalytics, 
+({
+  metrics,
+  revenueAnalytics,
   lowStockAlerts,
-  recentOrders 
+  recentOrders
 }: DashboardProps){
 
   const orders = [
@@ -172,7 +173,7 @@ export default function SupplierDashboard
                                 <option>Last 7 Days</option>
                             </select>
                         </div>
-                        
+
                         <div className="relative">
                             {/* Y-axis labels */}
                             {revenueAnalytics && revenueAnalytics.length > 0 && (
@@ -198,25 +199,25 @@ export default function SupplierDashboard
                                         const maxRevenue = Math.max(...revenueAnalytics.map(d => d.revenue));
                                         return revenueAnalytics.map((day, i) => {
                                             const barHeight = maxRevenue > 0 ? (day.revenue / maxRevenue) * 100 : 0;
-                                            
+
                                             return (
-                                                <div 
-                                                    key={i} 
+                                                <div
+                                                    key={i}
                                                     className="flex-1 relative group cursor-pointer"
                                                     style={{ minWidth: '40px' }}
                                                 >
                                                     {/* Bar background */}
                                                     <div className="absolute bottom-0 w-full h-full bg-teal-50 rounded-t-lg"></div>
-                                                    
+
                                                     {/* Bar fill */}
                                                     <div
                                                         className="absolute bottom-0 w-full bg-gradient-to-t from-[#0d9488] to-[#14b8a6] rounded-t-lg transition-all duration-500 shadow-lg group-hover:shadow-xl"
-                                                        style={{ 
+                                                        style={{
                                                             height: `${Math.max(barHeight, 3)}%`,
                                                             minHeight: '8px'
                                                         }}
                                                     ></div>
-                                                    
+
                                                     {/* Tooltip */}
                                                     <div className="opacity-0 group-hover:opacity-100 absolute -top-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs py-2 px-3 rounded-lg pointer-events-none transition-all duration-200 whitespace-nowrap z-20 shadow-xl">
                                                         <div className="font-bold text-sm">KES {day.revenue.toLocaleString()}</div>
@@ -241,13 +242,13 @@ export default function SupplierDashboard
                                     </div>
                                 )}
                             </div>
-                            
+
                             {/* X-axis labels */}
                             {revenueAnalytics && revenueAnalytics.length > 0 && (
                                 <div className="flex justify-between pl-14 pr-2 mt-3 border-t border-slate-100 pt-2">
                                     {revenueAnalytics.map((day, i) => (
-                                        <div 
-                                            key={i} 
+                                        <div
+                                            key={i}
                                             className="text-[11px] text-slate-600 font-medium text-center flex-1"
                                         >
                                             {day.date}

@@ -80,7 +80,8 @@ class AuthController extends Controller
             'organization_name' => $validated['company_name'],
             'organization_type' => 'SUPPLIER',
             'kra_pin' => $validated['kra_pin'],
-            'pharmacy_license' => $validated['ppb_license'], // Reusing this field for PPB license
+            'pharmacy_license' => $validated['ppb_license'], //tO BE CHANGED TO ppb_license
+            'ppb_license' => $validated['ppb_license'],
             'is_verified' => false, // Requires admin verification
         ]);
 

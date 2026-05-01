@@ -84,7 +84,7 @@ class ShipmentController extends Controller
             'status' => 'dispatched',
         ]);
 
-        $order->update(['status' => 'shipped']);
+        $order->update(['status' => 'Shipped']);
 
         return back()->with('success', 'Shipment created successfully');
     }

@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link ,usePage} from '@inertiajs/react';
 import { DashboardLayout } from './layout';
 import {
   Search, Filter, ShieldCheck, MapPin, Star,
@@ -15,87 +15,31 @@ interface Supplier {
   rating: number;
   reviewCount: number;
   verified: boolean;
-  kraCompliant: boolean;
-  specialties: string[];
+  kra_pin: string;
+  ppb_license: string;
+  county: string;
   description: string;
-  joinedDate: string;
+  created_at: string;
+  received_orders_count: number;
 }
 
-const MOCK_SUPPLIERS: Supplier[] = [
-  {
-    id: 's1',
-    name: 'Davita Pharma Ltd',
-    location: 'Industrial Area, Nairobi',
-    rating: 4.9,
-    reviewCount: 124,
-    verified: true,
-    kraCompliant: true,
-    specialties: ['Antibiotics', 'Vaccines', 'Pediatric'],
-    description: 'Premier distributor of globally recognized pharmaceutical brands in East Africa.',
-    joinedDate: '2018'
-  },
-  {
-    id: 's2',
-    name: 'Nairobi Medical Supplies',
-    location: 'Westlands, Nairobi',
-    rating: 4.7,
-    reviewCount: 89,
-    verified: true,
-    kraCompliant: true,
-    specialties: ['Surgicals', 'Emergency Care', 'Orthopedic'],
-    description: 'Leading provider of surgical equipment and emergency medical supplies.',
-    joinedDate: '2020'
-  },
-  {
-    id: 's3',
-    name: 'MedPlus Kenya',
-    location: 'Nyali, Mombasa',
-    rating: 4.8,
-    reviewCount: 56,
-    verified: true,
-    kraCompliant: true,
-    specialties: ['Diabetes Care', 'Cardiology', 'Hypertension'],
-    description: 'Specialized focus on chronic disease management medications and tools.',
-    joinedDate: '2019'
-  },
-  {
-    id: 's4',
-    name: 'SafeHealth Distributors',
-    location: 'CBD, Kisumu',
-    rating: 4.5,
-    reviewCount: 42,
-    verified: true,
-    kraCompliant: false,
-    specialties: ['General Generics', 'OTC', 'Diagnostics'],
-    description: 'Providing affordable generic alternatives and diagnostic kits nationwide.',
-    joinedDate: '2021'
-  },
-  {
-    id: 's5',
-    name: 'HealthFirst Kenya',
-    location: 'Eldoret',
-    rating: 4.6,
-    reviewCount: 31,
-    verified: false,
-    kraCompliant: true,
-    specialties: ['Oncology', 'Rare Diseases'],
-    description: 'Dedicated to specialized medicine and oncology treatment solutions.',
-    joinedDate: '2022'
-  }
-];
+
+
 
 export default function Suppliers() {
+    const MOCK_SUPPLIERS = usePage().props.suppliers as Supplier[];
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCounty, setFilterCounty] = useState('All Counties');
 
   const filteredSuppliers = useMemo(() => {
     return MOCK_SUPPLIERS.filter(s => {
-      const matchesSearch = s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           s.specialties.some(spec => spec.toLowerCase().includes(searchQuery.toLowerCase()));
-      const matchesCounty = filterCounty === 'All Counties' || s.location.includes(filterCounty);
-      return matchesSearch && matchesCounty;
+      const matchesCounty = filterCounty === 'All Counties' || s.county.includes(filterCounty);
+      return  matchesCounty;
     });
   }, [searchQuery, filterCounty]);
+
+  console.log(MOCK_SUPPLIERS);
 
   return (
     <DashboardLayout>
@@ -160,31 +104,26 @@ export default function Suppliers() {
                       {supplier.verified && <BadgeCheck className="h-4 w-4 text-blue-500 ml-1.5" />}
                     </h3>
                     <div className="flex items-center text-xs text-slate-500 mt-1">
-                      <MapPin className="h-3 w-3 mr-1" /> {supplier.location}
+                      <MapPin className="h-3 w-3 mr-1" /> {supplier.county}
                       <span className="mx-2">•</span>
                       <Star className="h-3 w-3 mr-1 text-amber-400 fill-current" /> {supplier.rating} ({supplier.reviewCount} reviews)
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                   {supplier.kraCompliant && (
+                   {supplier.kra_pin && (
                      <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">KRA ETIMS</span>
                    )}
-                   <span className="text-[10px] font-bold text-slate-400">Since {supplier.joinedDate}</span>
+                   <span className="text-[10px] font-bold text-slate-400">Since {supplier.created_at}</span>
                 </div>
               </div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                {supplier.received_orders_count} orders
+              </span>
 
-              <p className="text-sm text-slate-600 mb-6 line-clamp-2 leading-relaxed italic">
-                "{supplier.description}"
-              </p>
 
-              <div className="flex flex-wrap gap-2 mb-6">
-                {supplier.specialties.map(spec => (
-                  <span key={spec} className="px-3 py-1 bg-slate-50 text-slate-600 text-[10px] font-bold uppercase rounded-full border border-slate-100">
-                    {spec}
-                  </span>
-                ))}
-              </div>
+
+
 
               <div className="flex items-center justify-between pt-6 border-t border-slate-100">
                  <div className="flex items-center gap-4">
@@ -228,7 +167,9 @@ export default function Suppliers() {
             <p className="text-indigo-100 mb-8 leading-relaxed">
               Expand your reach to thousands of pharmacies and hospitals across Kenya. Our automated compliance engine makes B2B distribution simple and tax-compliant.
             </p>
-            <button className="px-8 py-3 bg-white text-indigo-900 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-indigo-50 transition-colors">
+            <button
+                onClick={ () => alert('Supplier application flow coming soon!') }
+            className="px-8 py-3 bg-white text-indigo-900 rounded-xl font-black text-sm uppercase tracking-wider hover:bg-indigo-50 transition-colors">
               Apply to Sell
             </button>
          </div>

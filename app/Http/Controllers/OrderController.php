@@ -23,7 +23,7 @@ class OrderController extends Controller
             ->latest()
             ->get();
 
-        return Inertia::render('Dashboard/Orders', [
+        return Inertia::render('Dashboard/orders', [
             'orders' => $orders
         ]);
     }
@@ -33,7 +33,7 @@ class OrderController extends Controller
      */
     public function create(Request $request)
     {
-        Auth::user(); // Ensure user is authenticated
+        Auth::user();
         $user = Auth::user();
 
         return Inertia::render('Checkout', [
@@ -113,7 +113,15 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+            if ($order->user_id !== Auth::id()) {
+                abort(403);
+            }
+
+            $order->load(['supplier', 'items']);
+
+            return Inertia::render('Dashboard/OrderDetail', [
+                'order' => $order,
+            ]);
     }
 
     /**

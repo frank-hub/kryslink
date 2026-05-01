@@ -57,6 +57,7 @@ class UserController extends Controller
             'user_type' => 'required|in:PHARMACY,HOSPITAL,SUPPLIER', // Maps to organization_type/role
             'kra_pin' => 'required|string|max:20|regex:/^[A-Z]\d{9}[A-Z]$/', // Kenyan PIN Format P000000000Z
             'county' => 'required|string|max:255',
+            'ppb_license' => 'required|string|max:255', // Pharmacy and Poisons Board License
         ]);
 
         $role = $request->user_type === 'SUPPLIER' ? 'SUPPLIER' : 'CUSTOMER';
@@ -74,6 +75,7 @@ class UserController extends Controller
             'organization_name' => $request->business_name,
             'organization_type' => $request->user_type,
             'kra_pin' => $request->kra_pin,
+            'ppb_license' => $request->ppb_license,
             'county' => $request->county,
             'is_verified' => false,
         ]);

@@ -7,6 +7,7 @@ import {
   Building2, History, Truck, Search
 } from 'lucide-react';
 import { initializeTheme } from '../../hooks/use-appearance';
+import { auth } from '@/routes/supplier';
 
 // Ensure theme is initialized
 initializeTheme();
@@ -28,6 +29,9 @@ const SidebarItem = ({ icon: Icon, label, href, active }: any) => (
 export const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { url } = usePage();
+//   const user = usePage().props.auth.user;
+const { auth } = usePage().props as any;
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
@@ -54,7 +58,7 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
               <div className="bg-[#0d9488] p-1.5 rounded-lg">
                 <Shield className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-slate-800 tracking-tight">MediConnect<span className="text-[#0d9488]">KE</span></span>
+              <span className="text-xl font-bold text-slate-800 tracking-tight">Krys<span className="text-[#0d9488]">Link</span></span>
            </Link>
            <button
              className="ml-auto lg:hidden text-slate-400 hover:text-slate-600"
@@ -68,11 +72,11 @@ export const DashboardLayout = ({ children }: { children: React.ReactNode }) => 
         <div className="px-6 py-6">
             <div className="flex items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <div className="h-10 w-10 rounded-full bg-teal-100 flex items-center justify-center text-[#0d9488] font-bold text-lg border-2 border-white shadow-sm">
-                    CP
+                    {auth.user.name.charAt(0)}
                 </div>
                 <div className="ml-3 overflow-hidden">
-                    <p className="text-sm font-bold text-slate-900 truncate">City Pharmacy</p>
-                    <p className="text-xs text-slate-500 truncate">KRA: P051234567Z</p>
+                    <p className="text-sm font-bold text-slate-900 truncate">{auth.user.organization_name}</p>
+                    <p className="text-xs text-slate-500 truncate">Type : {auth.user.organization_type}</p>
                 </div>
             </div>
         </div>
