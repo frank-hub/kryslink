@@ -140,8 +140,8 @@ const { auth } = usePage().props as any;
                 </button>
                 <div className="flex items-center space-x-3 pl-4 border-l border-slate-200">
                     <div className="text-right hidden md:block">
-                        <p className="text-sm font-bold text-slate-900">Dr. Sarah K.</p>
-                        <p className="text-xs text-slate-500">Chief Pharmacist</p>
+                        <p className="text-sm font-bold text-slate-900">{auth.user.name}</p>
+                        <p className="text-xs text-slate-500">{auth.user.organization_type}</p>
                     </div>
                     <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden border border-slate-300">
                         <User className="h-full w-full p-2 text-slate-400" />

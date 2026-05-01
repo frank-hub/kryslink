@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link ,usePage } from '@inertiajs/react';
 import { DashboardLayout } from './layout';
 import {
   TrendingUp, ShoppingBag, AlertCircle, FileCheck,
@@ -45,13 +45,15 @@ export default function DashboardIndex() {
     }
   };
 
+  const auth = usePage().props.auth as any;
+
   return (
     <DashboardLayout>
         <Head title="Dashboard" />
 
         <div className="mb-8">
             <h1 className="text-2xl font-bold text-slate-900">Overview</h1>
-            <p className="text-slate-500 mt-1">Welcome back, City Square Pharmacy.</p>
+            <p className="text-slate-500 mt-1">Welcome back, {auth.user.name}.</p>
         </div>
 
         {/* Metrics Grid */}
