@@ -67,6 +67,11 @@ Route::group(['prefix' => 'dashboard'], function () {
 
         Route::get('/compliance', [CustomerController::class, 'compliance'])->name('compliance');
         Route::get('/suppliers', [CustomerController::class, 'suppliers'])->name('dashboard.suppliers');
+
+        Route::get('/settings', [CustomerController::class, 'settings'])->name('settings');
+        Route::put('/settings', [CustomerController::class, 'update'])->name('settings.update');
+        Route::put('/settings/password', [CustomerController::class, 'updatePassword'])->name('settings.password');
+
     });
 Route::group(['middleware' => ['auth', 'verified']], function () {
 

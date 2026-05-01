@@ -41,7 +41,54 @@ class CustomerController extends Controller
             'created_at'        => $user->created_at,
         ],
     ]);
-    
+
+    }
+
+
+    public function settings()
+    {
+        return Inertia::render('Dashboard/Settings', [
+            'user' => Auth::user(),
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name'              => 'required|string|max:255',
+            'email'             => 'required|email|unique:users,email,' . $user->id,
+            'phone'             => 'nullable|string|max:20',
+            'organization_name' => 'nullable|string|max:255',
+            'county'            => 'nullable|string|max:100',
+            'location'          => 'nullable|string|max:255',
+            'kra_pin'           => 'nullable|string|max:50',
+            'pharmacy_license'  => 'nullable|string|max:100',
+            'ppb_license'       => 'nullable|string|max:100',
+        ]);
+
+        $user->update($request->only([
+            'name', 'email', 'phone',
+            'organization_name', 'county', 'location',
+            'kra_pin', 'pharmacy_license', 'ppb_license',
+        ]));
+
+        return back()->with('success', 'Profile updated successfully.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|current_password',
+            'password'         => 'required|min:8|confirmed',
+        ]);
+
+        Auth::user()->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return back()->with('success', 'Password updated successfully.');
     }
 
 }
