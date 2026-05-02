@@ -65,7 +65,7 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
                </Link>
             ) : (
               <button
-                onClick={onAuthOpen}
+                onClick={() => window.location.href = '/login'}
                 className="hidden sm:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#0d9488] hover:bg-[#0f766e] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0d9488]"
               >
                 Sign In
@@ -92,7 +92,7 @@ const Navbar = ({ cartCount, onOpenCart, isLoggedIn, onAuthOpen }: any) => {
               <button className="text-left text-slate-600 hover:text-[#0d9488] font-medium transition-colors py-2 border-b border-slate-100">Track Order</button>
               {!isLoggedIn && (
                 <button
-                  onClick={() => { onAuthOpen(); setIsMobileMenuOpen(false); }}
+                  onClick={() => window.location.href = '/login'}
                   className="w-full text-center px-4 py-2 bg-[#0d9488] text-white rounded-md font-medium"
                 >
                   Sign In

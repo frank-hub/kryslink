@@ -58,9 +58,7 @@ Route::get('/payment', function () {
 })->name('payment');
 
 Route::group(['prefix' => 'dashboard'], function () {
-            Route::get('/index', function () {
-            return Inertia::render('Dashboard/index');
-        })->name('dashboard.index');
+        Route::get('/index', [CustomerController::class, 'index'])->name('dashboard');
 
         Route::get('/orders', [OrderController::class, 'index'])->name('customer.orders');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');

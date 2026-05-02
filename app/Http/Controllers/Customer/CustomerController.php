@@ -8,9 +8,47 @@ use App\Models\User;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class CustomerController extends Controller
 {
+    public function index()
+    {
+        $user = Auth::user();
+
+        $orders = Order::with('supplier')
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+
+        $recentOrders = $orders->take(4);
+
+        $metrics = [
+            'total_spend'     => $orders->whereIn('status', ['Delivered', 'Shipped', 'Processing'])->sum('total_amount'),
+            'active_orders'   => $orders->whereIn('status', ['Processing', 'Shipped'])->count(),
+            'pending_payment' => $orders->where('payment_status', 'Pending')->sum('total_amount'),
+        ];
+
+        $compliance = [
+            'is_verified'      => $user->is_verified,
+            'kra_pin'          => !empty($user->kra_pin),
+            'pharmacy_license' => !empty($user->pharmacy_license),
+            'ppb_license'      => !empty($user->ppb_license),
+            'score'            => collect([
+                $user->is_verified,
+                !empty($user->kra_pin),
+                !empty($user->pharmacy_license),
+                !empty($user->ppb_license),
+            ])->filter()->count(),
+        ];
+
+        return Inertia::render('Dashboard/index', [
+            'recentOrders' => $recentOrders,
+            'metrics'      => $metrics,
+            'compliance'   => $compliance,
+        ]);
+    }
+
     public function suppliers(){
         $suppliers = User::where('organization_type', 'SUPPLIER')
         ->withCount('receivedOrders as received_orders_count')
