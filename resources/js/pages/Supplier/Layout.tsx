@@ -33,7 +33,8 @@ const SidebarItem = ({ icon: Icon, label, href, active, badge }: any) => (
 
 export const SupplierLayout = ({ children }: PropsWithChildren) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { url } = usePage();
+  const { url  } = usePage();
+  const { auth } = usePage().props as any;
 
   return (
     <div className="min-h-screen bg-slate-50 flex font-sans text-slate-900">
@@ -77,10 +78,10 @@ export const SupplierLayout = ({ children }: PropsWithChildren) => {
                     DP
                 </div>
                 <div className="ml-3 overflow-hidden flex-1">
-                    <p className="text-sm font-bold text-slate-900 truncate">Davita Pharma</p>
+                    <p className="text-sm font-bold text-slate-900 truncate">{auth.user.organization_name}</p>
                     <div className="flex items-center">
                         <div className="h-2 w-2 rounded-full bg-green-500 mr-1.5"></div>
-                        <p className="text-xs text-slate-500 truncate">Verified Seller</p>
+                        <p className="text-xs text-slate-500 truncate">{auth.user.role}</p>
                     </div>
                 </div>
                 <ChevronDown className="h-4 w-4 text-slate-400" />

@@ -12,25 +12,45 @@ class SupplierController extends Controller
 {
     public function orders()
     {
-        // Fetch orders related to the supplier
         $orders = Order::with(['user', 'items'])
-        ->where('supplier_id', Auth::id())
-        ->latest()
-        ->get()
-        ->map(function ($order) {
-            return [
-                'id' => $order->order_reference,
-                'customer' => $order->user->name ?? 'N/A',
-                'date' => $order->created_at->format('M d, Y'),
-                'amount' => $order->total_amount,
-                'payment' => ucfirst($order->payment_status), // 'paid', 'pending', 'failed' → 'Paid', 'Pending', 'Failed'
-                'status' => ucfirst($order->status), // 'pending', 'processing', etc. → 'Pending', 'Processing'
-                'items' => $order->items->count(),
-            ];
-        });
+            ->where('supplier_id', Auth::id())
+            ->latest()
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id'       => $order->order_reference,
+                    'order_id' => $order->id,
+                    'customer' => $order->user->name ?? 'N/A',
+                    'date'     => $order->created_at->format('M d, Y'),
+                    'amount'   => $order->total_amount,
+                    'payment'  => ucfirst($order->payment_status),
+                    'status'   => ucfirst($order->status),
+                    'items'    => $order->items->count(),
+                ];
+            });
 
         return Inertia::render('Supplier/Orders', [
-            'orders' => $orders,
+            'orders'  => $orders,
+            'flash'   => [
+                'success' => session('success'),
+                'error'   => session('error'),
+            ],
         ]);
+    }
+
+    public function markOrderAsPaid(Order $order)
+    {
+        if ($order->supplier_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($order->payment_status === 'Paid') {
+            return redirect()->route('supplier.orders')->with('error', 'Order is already marked as paid.');
+        }
+
+        $order->payment_status = 'Paid';
+        $order->save();
+
+        return redirect()->route('supplier.orders')->with('success', 'Order marked as paid successfully.');
     }
 }

@@ -17,68 +17,68 @@ class AnalyticsController extends Controller
     public function index()
     {
         $supplierId = Auth::id();
-        
+
         // Date ranges
         $currentPeriodStart = Carbon::now()->startOfMonth();
         $previousPeriodStart = Carbon::now()->subMonth()->startOfMonth();
         $previousPeriodEnd = Carbon::now()->subMonth()->endOfMonth();
-        
+
         // 1. GROSS SALES (from orders.total_amount)
         $currentGrossSales = Order::where('supplier_id', $supplierId)
             ->where('payment_status', 'paid')
             ->where('created_at', '>=', $currentPeriodStart)
             ->sum('total_amount');
-            
+
         $previousGrossSales = Order::where('supplier_id', $supplierId)
             ->where('payment_status', 'paid')
             ->whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd])
             ->sum('total_amount');
-            
-        $grossSalesChange = $previousGrossSales > 0 
-            ? (($currentGrossSales - $previousGrossSales) / $previousGrossSales) * 100 
+
+        $grossSalesChange = $previousGrossSales > 0
+            ? (($currentGrossSales - $previousGrossSales) / $previousGrossSales) * 100
             : 0;
-        
+
         // 2. ORDER VOLUME
         $currentOrderVolume = Order::where('supplier_id', $supplierId)
             ->where('created_at', '>=', $currentPeriodStart)
             ->count();
-            
+
         $previousOrderVolume = Order::where('supplier_id', $supplierId)
             ->whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd])
             ->count();
-            
-        $orderVolumeChange = $previousOrderVolume > 0 
-            ? (($currentOrderVolume - $previousOrderVolume) / $previousOrderVolume) * 100 
+
+        $orderVolumeChange = $previousOrderVolume > 0
+            ? (($currentOrderVolume - $previousOrderVolume) / $previousOrderVolume) * 100
             : 0;
-        
+
         // 3. AVERAGE ORDER VALUE
-        $currentAvgOrderValue = $currentOrderVolume > 0 
-            ? $currentGrossSales / $currentOrderVolume 
+        $currentAvgOrderValue = $currentOrderVolume > 0
+            ? $currentGrossSales / $currentOrderVolume
             : 0;
-            
-        $previousAvgOrderValue = $previousOrderVolume > 0 
-            ? $previousGrossSales / $previousOrderVolume 
+
+        $previousAvgOrderValue = $previousOrderVolume > 0
+            ? $previousGrossSales / $previousOrderVolume
             : 0;
-            
-        $avgOrderValueChange = $previousAvgOrderValue > 0 
-            ? (($currentAvgOrderValue - $previousAvgOrderValue) / $previousAvgOrderValue) * 100 
+
+        $avgOrderValueChange = $previousAvgOrderValue > 0
+            ? (($currentAvgOrderValue - $previousAvgOrderValue) / $previousAvgOrderValue) * 100
             : 0;
-        
+
         // 4. NEW CUSTOMERS (unique customers who ordered this month)
         $currentNewCustomers = Order::where('supplier_id', $supplierId)
             ->where('created_at', '>=', $currentPeriodStart)
             ->distinct('user_id')
             ->count('user_id');
-            
+
         $previousNewCustomers = Order::where('supplier_id', $supplierId)
             ->whereBetween('created_at', [$previousPeriodStart, $previousPeriodEnd])
             ->distinct('user_id')
             ->count('user_id');
-            
-        $newCustomersChange = $previousNewCustomers > 0 
-            ? (($currentNewCustomers - $previousNewCustomers) / $previousNewCustomers) * 100 
+
+        $newCustomersChange = $previousNewCustomers > 0
+            ? (($currentNewCustomers - $previousNewCustomers) / $previousNewCustomers) * 100
             : 0;
-        
+
         // 5. REVENUE PERFORMANCE (Last 30 days - daily)
         $revenuePerformance = Order::where('supplier_id', $supplierId)
             ->where('payment_status', 'paid')
@@ -96,30 +96,30 @@ class AnalyticsController extends Controller
                     'revenue' => (float) $item->revenue,
                 ];
             });
-        
+
         // Fill in missing dates with zero revenue
         $filledRevenueData = $this->fillMissingDates($revenuePerformance, 30);
-        
+
         // 6. REGIONAL SALES (Extract county from shipping_address JSON/LONGTEXT)
         $orders = Order::where('supplier_id', $supplierId)
             ->where('payment_status', 'paid')
             ->where('created_at', '>=', $currentPeriodStart)
             ->select('shipping_address', 'total_amount')
             ->get();
-        
+
         $regionalSalesGrouped = $orders->groupBy(function ($order) {
             // Decode shipping_address JSON
-            $address = is_string($order->shipping_address) 
-                ? json_decode($order->shipping_address, true) 
+            $address = is_string($order->shipping_address)
+                ? json_decode($order->shipping_address, true)
                 : $order->shipping_address;
-            
+
             // Extract county
             if (is_array($address) && isset($address['county'])) {
                 return $address['county'];
             }
             return 'Others';
         });
-        
+
         $regionalSales = $regionalSalesGrouped->map(function ($orders, $region) {
             return [
                 'region' => $region,
@@ -127,7 +127,7 @@ class AnalyticsController extends Controller
                 'orders' => $orders->count(),
             ];
         })->sortByDesc('sales')->values();
-        
+
         // Calculate percentages
         $totalRegionalSales = $regionalSales->sum('sales');
         $regionalSales = $regionalSales->map(function ($item) use ($totalRegionalSales) {
@@ -135,15 +135,15 @@ class AnalyticsController extends Controller
                 'region' => $item['region'],
                 'sales' => $item['sales'],
                 'orders' => $item['orders'],
-                'percentage' => $totalRegionalSales > 0 
-                    ? round(($item['sales'] / $totalRegionalSales) * 100, 1) 
+                'percentage' => $totalRegionalSales > 0
+                    ? round(($item['sales'] / $totalRegionalSales) * 100, 1)
                     : 0,
             ];
         });
-        
+
         // Get top region
         $topRegion = $regionalSales->first();
-        
+
         // 7. TOP SELLING PRODUCTS (from order_items)
         $topProducts = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -166,7 +166,7 @@ class AnalyticsController extends Controller
                     'revenue' => (float) $item->total_revenue,
                 ];
             });
-        
+
         // 8. SALES BY CATEGORY (join with products table)
        $salesByCategory = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
@@ -190,7 +190,7 @@ class AnalyticsController extends Controller
                     'orders' => $item->order_count,
                 ];
             });
-        
+
         // 9. ORDER STATUS BREAKDOWN
         $orderStatusBreakdown = Order::where('supplier_id', $supplierId)
             ->where('created_at', '>=', $currentPeriodStart)
@@ -203,7 +203,7 @@ class AnalyticsController extends Controller
                     'count' => $item->count,
                 ];
             });
-        
+
         // 10. PAYMENT STATUS BREAKDOWN
         $paymentStatusBreakdown = Order::where('supplier_id', $supplierId)
             ->where('created_at', '>=', $currentPeriodStart)
@@ -217,7 +217,7 @@ class AnalyticsController extends Controller
                     'amount' => (float) $item->total,
                 ];
             });
-        
+
         return Inertia::render('Supplier/Analytics', [
             'metrics' => [
                 'grossSales' => [
@@ -252,7 +252,7 @@ class AnalyticsController extends Controller
             'paymentStatusBreakdown' => $paymentStatusBreakdown,
         ]);
     }
-    
+
     /**
      * Fill missing dates with zero revenue for continuous chart
      */
@@ -260,10 +260,10 @@ class AnalyticsController extends Controller
     {
         $result = collect();
         $dataByDate = $data->keyBy('date');
-        
+
         for ($i = $days - 1; $i >= 0; $i--) {
             $date = Carbon::now()->subDays($i)->format('M d');
-            
+
             if ($dataByDate->has($date)) {
                 $result->push($dataByDate[$date]);
             } else {
@@ -273,7 +273,7 @@ class AnalyticsController extends Controller
                 ]);
             }
         }
-        
+
         return $result;
     }
 }

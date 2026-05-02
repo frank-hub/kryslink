@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage, useForm, router } from '@inertiajs/react';
 import { SupplierLayout } from './Layout';
+
 import {
   Search, Filter, Download, Eye, Truck, CheckCircle,
   XCircle, Clock, MoreHorizontal, Calendar, ChevronDown, X,
   MapPin, ClipboardList, Info, RefreshCw
 } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 interface Order {
   id: string;
-  order_id: number; 
+  order_id: number;
   customer: string;
   date: string;
   amount: number;
@@ -48,7 +50,8 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const { flash } = usePage().props as any;
+const { flash } = usePage().props;
+console.log('Flash messages:', flash);
 
   // ADD THIS - Form for updating order status
   const statusForm = useForm({
@@ -107,10 +110,10 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   };
 
   // ADD THIS - Handle status update
-  const handleUpdateStatus = (newStatus: string) => {
+  const handlePaid = (newStatus: string) => {
     if (!selectedOrder) return;
 
-    router.patch(router('orders.update-status', selectedOrder.order_id), {
+    router.patch(route('supplier.orders.mark-paid', selectedOrder.order_id), {
       status: newStatus,
     }, {
       onSuccess: () => {
@@ -259,29 +262,21 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
                         </div>
 
                         <div className="space-y-3">
-                             <p className="text-sm font-bold text-slate-700 mb-2">Select New Status</p>
-                             {[
-                                { id: 'pending', label: 'Pending', icon: Clock, color: 'text-amber-500', desc: 'Order received, waiting for confirmation.' },
-                                { id: 'processing', label: 'Processing', icon: ClipboardList, color: 'text-blue-500', desc: 'Items are being picked and packed.' },
-                                { id: 'delivered', label: 'Delivered', icon: CheckCircle, color: 'text-emerald-500', desc: 'Medicine has reached the pharmacy.' },
-                                { id: 'cancelled', label: 'Cancelled', icon: XCircle, color: 'text-red-500', desc: 'Order will be terminated.' }
-                             ].map((item) => (
-                                <button
-                                    key={item.id}
-                                    onClick={() => handleUpdateStatus(item.id)}
-                                    disabled={statusForm.processing}
-                                    className="w-full flex items-center p-3 rounded-xl border border-slate-200 hover:border-[#0d9488] hover:bg-teal-50 transition-all text-left group disabled:opacity-50"
-                                >
-                                    <div className={`p-2 rounded-lg bg-white shadow-sm border border-slate-100 mr-4 ${item.color}`}>
-                                        <item.icon className="h-5 w-5" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-sm font-bold text-slate-900 group-hover:text-[#0d9488]">{item.label}</p>
-                                        <p className="text-[10px] text-slate-500">{item.desc}</p>
-                                    </div>
-                                    <div className="h-4 w-4 border-2 border-slate-300 rounded-full group-hover:border-[#0d9488]"></div>
-                                </button>
-                             ))}
+                             <p className="text-sm font-bold text-slate-700 mb-2">Total Amount</p>
+                             <p className="text-lg font-bold text-slate-900">Ksh {selectedOrder.amount}</p>
+                             <Link
+                                href={route('supplier.orders.mark-paid', selectedOrder.order_id)}
+                                onSuccess={() => {
+                                    setIsStatusModalOpen(false);
+                                    setSelectedOrder(null);
+                                }}
+                                method="patch"
+                                 as="button"
+                                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-colors"
+                            >
+                                Mark as Paid
+                            </Link>
+
                         </div>
                     </div>
                     <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 text-right">

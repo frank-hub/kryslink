@@ -99,6 +99,7 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(function () {
 
+
     //shipment routes
     Route::get('/shipments', [ShipmentController::class, 'index'])->name('shipments.index');
     Route::post('/shipments/store', [ShipmentController::class, 'store'])->name('shipments.store');
@@ -115,6 +116,9 @@ Route::middleware(['auth'])->prefix('supplier')->name('supplier.')->group(functi
     Route::patch('/payout-methods/{payoutMethod}', [PayoutMethodController::class, 'update'])->name('payout-methods.update');
     Route::post('/payout-methods/{payoutMethod}/set-primary', [PayoutMethodController::class, 'setPrimary'])->name('payout-methods.set-primary');
     Route::delete('/payout-methods/{payoutMethod}', [PayoutMethodController::class, 'destroy'])->name('payout-methods.destroy');
+
+    //Mark order as paid
+    Route::patch('/orders/{order}/mark-paid', [SupplierController::class, 'markOrderAsPaid'])->name('orders.mark-paid');
 
 });
 
