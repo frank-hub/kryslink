@@ -21,8 +21,6 @@ export default function SupplierProducts() {
   const initialProducts = products.data;
 
 
-  console.log('image:', products.data[0]);
-
 
 //   const products = MOCK_PRODUCTS.slice(0, 8).map(p => ({
 //     ...p,
@@ -113,7 +111,11 @@ export default function SupplierProducts() {
                             <td className="px-6 py-4">
                                 <div className="flex items-center">
                                     <div className="h-10 w-10 flex-shrink-0 bg-white rounded-lg border border-slate-200 p-1 mr-3">
-                                        <img src={product.images} alt="" className="h-full w-full object-contain mix-blend-multiply" />
+                                        <img
+                                        src={product.image}
+                                        alt={product.name}
+                                        className="h-full w-full object-contain mix-blend-multiply"
+                                        />
                                     </div>
                                     <div>
                                         <div className="font-medium text-slate-900">{product.name}</div>
@@ -140,10 +142,21 @@ export default function SupplierProducts() {
                             </td>
                             <td className="px-6 py-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                    <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                                    <Link
+                                        href={`/supplier/products/${product.id}/edit`}
+
+
+                                    className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors">
                                         <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
+                                    </Link>
+                                    <button 
+                                    onClick={() => {
+                                        if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+                                            // Call delete API here
+                                            window.location.href = `/supplier/products/delete/${product.id}`;
+                                        }
+                                    }}
+                                    className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors">
                                         <Trash2 className="h-4 w-4" />
                                     </button>
                                     <button className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition-colors">

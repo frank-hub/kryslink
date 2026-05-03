@@ -82,7 +82,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
         Route::post('/products/store', [ProductController::class, 'store'])->name('supplier.products.store');
 
         Route::get('/products/create', [ProductController::class, 'create'])->name('supplier.products.create');
-
+        Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('supplier.products.edit');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('supplier.products.update');
+        Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('supplier.products.destroy');
         Route::get('/orders',[SupplierController::class,'orders'])->name('supplier.orders');
 
         Route::get('/settings', function () {

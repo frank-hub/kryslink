@@ -51,7 +51,6 @@ export default function SupplierOrders({orders}: OrdersPageProps) {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
 const { flash } = usePage().props;
-console.log('Flash messages:', flash);
 
   // ADD THIS - Form for updating order status
   const statusForm = useForm({

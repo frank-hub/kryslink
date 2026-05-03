@@ -16,6 +16,7 @@ export interface Product {
   price: number;
   stock: number;
   images: string;
+  image: string;
   sku: string;
   generic_name: string | null;
   pack_size: string | null;

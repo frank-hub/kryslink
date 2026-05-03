@@ -38,7 +38,22 @@ class ProductController extends Controller
         $sortDirection = $request->get('direction', 'desc');
         $query->orderBy($sortField, $sortDirection);
 
-        $products = $query->paginate(15);
+        $products = $query->paginate(15)->through(function ($product) {
+            $images = is_array($product->images)
+                ? $product->images
+                : (json_decode($product->images, true) ?? [$product->images]);
+
+            return [
+                'id'       => $product->id,
+                'name'     => $product->name,
+                'sku'      => $product->sku,
+                'price'    => $product->price,
+                'stock'    => $product->stock,
+                'status'   => $product->status,
+                'image'    => asset('storage/' . ($images[0] ?? '')),
+                'category' => $product->category,
+            ];
+        });
 
         // Stats
         $stats = [
@@ -130,10 +145,13 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
+            if ($product->supplier_id !== Auth::id()) {
+                abort(403);
+            }
 
         $categories = Category::active()->get();
 
-        return Inertia::render('Supplier/Products/Edit', [
+        return Inertia::render('Supplier/EditProduct', [
             'product' => $product,
             'categories' => $categories,
         ]);
