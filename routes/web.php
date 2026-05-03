@@ -32,9 +32,7 @@ Route::post('/supplier/login', [AuthController::class, 'login']);
 Route::post('/supplier/register', [AuthController::class, 'register']);
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/marketplace', function () {
-    return Inertia::render('Marketplace');
-})->name('marketplace');
+    Route::get('/marketplace',[CustomerController::class,'marketplace'])->name('marketplace');
     Route::get('/checkout',[OrderController::class,'create'])->name('checkout');
     Route::post('/orders/store',[OrderController::class,'store'])->name('orders.store');
     Route::get('payment.confirmation', function () {

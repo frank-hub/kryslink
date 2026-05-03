@@ -9,6 +9,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Order;
+use App\Models\Product;
+use App\Models\Category;
+
 
 class CustomerController extends Controller
 {
@@ -137,6 +140,70 @@ class CustomerController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    public function marketplace(Request $request)
+    {
+        $query = Product::with(['category', 'supplier'])
+            ->where('status', 'active')
+            ->where('stock', '>', 0);
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('generic_name', 'like', "%{$search}%")
+                  ->orWhereHas('supplier', fn($q) => $q->where('organization_name', 'like', "%{$search}%"));
+            });
+        }
+
+        // Category filter
+        if ($request->filled('category') && $request->category !== 'All') {
+            $query->whereHas('category', fn($q) => $q->where('name', $request->category));
+        }
+
+        // Sorting
+        match($request->get('sort', 'featured')) {
+            'price_asc'  => $query->orderBy('price', 'asc'),
+            'price_desc' => $query->orderBy('price', 'desc'),
+            default      => $query->orderByDesc('is_verified')->latest(),
+        };
+
+        $products = $query->paginate(20)->through(function ($product) {
+            $images = is_array($product->images)
+                ? $product->images
+                : (json_decode($product->images, true) ?? []);
+
+            return [
+                'id'       => $product->id,
+                'name'     => $product->name,
+                'slug'     => $product->slug,
+                'category' => $product->category?->name ?? 'Uncategorized',
+                'supplier' => $product->supplier?->organization_name ?? $product->supplier?->name ?? 'Unknown',
+                'price'    => (float) $product->price,
+                'stock'    => $product->stock,
+                'image'    => count($images) > 0 ? asset('storage/' . $images[0]) : null,
+                'verified' => (bool) $product->is_verified,
+                'dosage'   => $product->dosage,
+                'form'     => $product->form,
+                'requires_prescription' => $product->requires_prescription,
+            ];
+        });
+
+        $categories = Category::orderBy('name')
+            ->pluck('name')
+            ->prepend('All');
+
+        return Inertia::render('Marketplace', [
+            'products'   => $products,
+            'categories' => $categories,
+            'filters' => [
+                'search'   => $request->get('search', ''),
+                'category' => $request->get('category', 'All'),
+                'sort'     => $request->get('sort', 'featured'),
+            ],
+        ]);
     }
 
 }
